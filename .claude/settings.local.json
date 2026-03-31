@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip install:*)",
+      "Bash(python manage.py makemigrations centers)",
+      "Bash(python manage.py migrate)",
+      "Bash(curl -s http://127.0.0.1:8000/api/regions/ -H \"Accept-Language: ru\")",
+      "Bash(python -m json.tool)",
+      "Bash(taskkill /f /im python.exe)",
+      "Bash(python -c \":*)",
+      "Bash(curl -s http://127.0.0.1:8000/api/ajax/districts/1/)",
+      "Bash(curl -v http://127.0.0.1:8000/api/ajax/districts/1/)"
+    ]
+  }
+}

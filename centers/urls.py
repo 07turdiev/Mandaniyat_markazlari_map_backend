@@ -12,4 +12,7 @@ urlpatterns = [
     path('', include(router.urls)),
     path('map-data/', views.map_data, name='map-data'),
     path('statistics/', views.statistics, name='statistics'),
+    # Admin AJAX endpointlari
+    path('ajax/districts/<int:region_id>/', views.ajax_districts, name='ajax-districts'),
+    path('ajax/mahallas/<int:district_id>/', views.ajax_mahallas, name='ajax-mahallas'),
 ]

@@ -7,6 +7,7 @@ class Region(models.Model):
     name = models.CharField(max_length=100, verbose_name="Nomi")
     soato = models.CharField(max_length=10, blank=True, db_index=True, verbose_name="SOATO kodi")
     name_ru = models.CharField(max_length=100, blank=True, verbose_name="Nomi (ruscha)")
+    name_en = models.CharField(max_length=100, blank=True, verbose_name="Nomi (inglizcha)")
     population = models.PositiveIntegerField(default=0, verbose_name="Aholi soni")
     center_lat = models.FloatField(default=0, verbose_name="Markaz (kenglik)")
     center_lng = models.FloatField(default=0, verbose_name="Markaz (uzunlik)")
@@ -29,6 +30,7 @@ class District(models.Model):
     name = models.CharField(max_length=100, verbose_name="Nomi")
     soato = models.CharField(max_length=10, blank=True, db_index=True, verbose_name="SOATO kodi")
     name_ru = models.CharField(max_length=100, blank=True, verbose_name="Nomi (ruscha)")
+    name_en = models.CharField(max_length=100, blank=True, verbose_name="Nomi (inglizcha)")
     population = models.PositiveIntegerField(default=0, verbose_name="Aholi soni")
 
     class Meta:
@@ -88,6 +90,8 @@ class CulturalCenter(models.Model):
         related_name='centers', verbose_name="Mahalla"
     )
     name = models.CharField(max_length=255, verbose_name="Nomi")
+    name_ru = models.CharField(max_length=255, blank=True, verbose_name="Nomi (ruscha)")
+    name_en = models.CharField(max_length=255, blank=True, verbose_name="Nomi (inglizcha)")
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, verbose_name="Kategoriya")
     lat = models.FloatField(verbose_name="Kenglik (latitude)")
     lng = models.FloatField(verbose_name="Uzunlik (longitude)")

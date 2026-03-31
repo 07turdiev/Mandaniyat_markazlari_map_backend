@@ -17,6 +17,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'drf_spectacular',
     'corsheaders',
     'centers',
 ]
@@ -25,6 +26,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'centers.middleware.LanguageMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -37,7 +39,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -85,6 +87,24 @@ CORS_ALLOW_ALL_ORIGINS = True
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 50,
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+# Swagger / OpenAPI
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Madaniyat markazlari API',
+    'DESCRIPTION': "O'zbekiston Respublikasi madaniyat markazlari interaktiv xaritasi API",
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'TAGS': [
+        {'name': 'regions', 'description': 'Viloyatlar'},
+        {'name': 'districts', 'description': 'Tumanlar'},
+        {'name': 'mahallas', 'description': 'Mahallalar'},
+        {'name': 'centers', 'description': 'Madaniyat markazlari'},
+        {'name': 'map', 'description': 'Xarita ma\'lumotlari'},
+        {'name': 'statistics', 'description': 'Statistika'},
+    ],
+    'COMPONENT_SPLIT_REQUEST': True,
 }
 
 # Jazzmin
