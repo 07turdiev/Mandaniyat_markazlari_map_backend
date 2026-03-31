@@ -13,6 +13,14 @@ CORS_ALLOWED_ORIGINS = [
     'http://markaz.madaniyhayot.uz',
 ]
 
+# DB ni docker volume ichida saqlash
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': '/app/data/db.sqlite3',
+    }
+}
+
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
