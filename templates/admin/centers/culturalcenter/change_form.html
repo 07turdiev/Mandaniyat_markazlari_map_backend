@@ -10,19 +10,23 @@ var CASCADE_DATA = {
 };
 
 window.addEventListener('load', function() {
-    // 1 soniya kutish — select2, jazzmin, hamma narsa tayyor bo'lishini kafolatlaydi
     setTimeout(function() {
         var $ = django.jQuery;
         var $r = $('#id_region');
         var $d = $('#id_district');
         var $m = $('#id_mahalla');
+        var $sm = $('#id_serving_mahallas');
         if (!$r.length || !$d.length) return;
 
         var savedD = $d.val();
         var savedM = $m.length ? $m.val() : '';
+        var savedSM = [];
+        if ($sm.length) {
+            $sm.find('option:selected').each(function() { savedSM.push($(this).val()); });
+        }
 
-        // Select2 ni olib tashlash — oddiy selectga aylantirish
-        [$r, $d, $m].forEach(function($el) {
+        // Select2 ni olib tashlash
+        [$r, $d, $m, $sm].forEach(function($el) {
             if ($el.length && $el.data('select2')) {
                 $el.select2('destroy');
             }
@@ -36,28 +40,78 @@ window.addEventListener('load', function() {
             });
         }
 
-        // Viloyat o'zgarganda
+        function fillMulti($sel, items, savedArr) {
+            $sel.empty();
+            (items || []).forEach(function(item) {
+                var sel = savedArr.indexOf(String(item.id)) >= 0 ? ' selected' : '';
+                $sel.append('<option value="' + item.id + '"' + sel + '>' + item.name + '</option>');
+            });
+        }
+
         $r[0].onchange = function() {
-            savedD = ''; savedM = '';
+            savedD = ''; savedM = ''; savedSM = [];
             fill($d, CASCADE_DATA.districts[this.value] || [], '', '-- Tumanni tanlang --');
             if ($m.length) fill($m, [], '', '-- Avval tuman tanlang --');
+            if ($sm.length) fillMulti($sm, [], []);
         };
 
-        // Tuman o'zgarganda
         $d[0].onchange = function() {
-            savedM = '';
-            if ($m.length) fill($m, CASCADE_DATA.mahallas[this.value] || [], '', '-- Mahallani tanlang --');
+            savedM = ''; savedSM = [];
+            var items = CASCADE_DATA.mahallas[this.value] || [];
+            if ($m.length) fill($m, items, '', '-- Mahallani tanlang --');
+            if ($sm.length) fillMulti($sm, items, []);
         };
 
-        // Tahrirlash rejimida - mavjud qiymatlarni yuklash
         if ($r.val()) {
             fill($d, CASCADE_DATA.districts[$r.val()] || [], savedD, '-- Tumanni tanlang --');
-            if ($d.val() && $m.length) {
-                fill($m, CASCADE_DATA.mahallas[$d.val()] || [], savedM, '-- Mahallani tanlang --');
+            if ($d.val()) {
+                var items = CASCADE_DATA.mahallas[$d.val()] || [];
+                if ($m.length) fill($m, items, savedM, '-- Mahallani tanlang --');
+                if ($sm.length) fillMulti($sm, items, savedSM);
             }
         }
 
-        console.log('[CASCADE] Tayyor! Viloyatlar: ' + Object.keys(CASCADE_DATA.districts).length);
+        // === O'z binosiga ega checkbox ===
+        var $cb = $('#id_has_own_building');
+        if ($cb.length) {
+            var buildingFields = [
+                '#id_total_land_area', '#id_building_area', '#id_buildings_count',
+                '#id_built_year', '#id_building_floors', '#id_condition',
+                '#id_building_technical_info', '#id_rooms_count',
+                '#id_auditorium_area', '#id_dining_area',
+                '#id_restrooms_count', '#id_additional_buildings_count',
+                '#id_has_heating', '#id_has_electricity', '#id_has_gas',
+                '#id_has_water', '#id_has_sewerage'
+            ];
+
+            function toggleBuilding() {
+                var disabled = !$cb.is(':checked');
+                buildingFields.forEach(function(sel) {
+                    var $el = $(sel);
+                    $el.prop('disabled', disabled);
+                    $el.closest('.form-group, .form-row, tr').css('opacity', disabled ? '0.4' : '1');
+                });
+                // Asosiy rasm
+                var $img = $('#id_image');
+                $img.prop('disabled', disabled);
+                $img.closest('.form-group, .form-row').css('opacity', disabled ? '0.4' : '1');
+                // Rasmlar inline
+                $('.inline-group').each(function() {
+                    $(this).find('input, select, textarea, button, a.inline-deletelink').prop('disabled', disabled);
+                    $(this).css('opacity', disabled ? '0.4' : '1');
+                    if (disabled) {
+                        $(this).find('a').css('pointer-events', 'none');
+                    } else {
+                        $(this).find('a').css('pointer-events', '');
+                    }
+                });
+            }
+
+            $cb.on('change', toggleBuilding);
+            toggleBuilding();
+        }
+
+        console.log('[CASCADE] Tayyor!');
     }, 1000);
 });
 </script>

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Region, District, Mahalla, CulturalCenter, CulturalCenterImage
+from .models import Region, District, Mahalla, CulturalCenter, CulturalCenterImage, ActivityType
 from .middleware import get_current_language
 
 
@@ -25,6 +25,12 @@ class MahallaSerializer(TranslatedNameMixin, serializers.ModelSerializer):
         return self.get_translated_name(obj)
 
 
+class ActivityTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ActivityType
+        fields = ['id', 'name']
+
+
 class CulturalCenterImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = CulturalCenterImage
@@ -40,14 +46,31 @@ class CulturalCenterSerializer(TranslatedNameMixin, serializers.ModelSerializer)
     mahalla_name = serializers.SerializerMethodField()
     mahalla_population = serializers.IntegerField(source='mahalla.population', read_only=True, default=0)
     images = CulturalCenterImageSerializer(many=True, read_only=True)
+    activity_types = ActivityTypeSerializer(many=True, read_only=True)
+    serving_mahallas = MahallaSerializer(many=True, read_only=True)
+    total_employees = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = CulturalCenter
         fields = [
-            'id', 'name', 'category', 'lat', 'lng', 'address',
-            'director', 'phone', 'employees', 'capacity', 'built_year',
-            'condition', 'area_sqm', 'description', 'image', 'images',
-            'mahalla', 'mahalla_name', 'mahalla_population',
+            'id', 'name', 'category', 'balance_holder', 'activity_types',
+            'lat', 'lng', 'address', 'map_url',
+            'has_own_building', 'image', 'images',
+            # Obyekt haqida
+            'circles_count', 'titled_teams_count', 'library_activity_count',
+            # Hodimlar
+            'management_staff', 'creative_staff', 'technical_staff',
+            'titled_team_staff', 'total_employees',
+            # Obyekt tasnifi
+            'total_land_area', 'building_area', 'buildings_count',
+            'built_year', 'building_floors', 'condition',
+            'building_technical_info', 'rooms_count',
+            'auditorium_area', 'dining_area',
+            'restrooms_count', 'additional_buildings_count',
+            # Kommunikatsiyalar
+            'has_heating', 'has_electricity', 'has_gas', 'has_water', 'has_sewerage',
+            # Bog'lanishlar
+            'mahalla', 'mahalla_name', 'mahalla_population', 'serving_mahallas',
             'region_soato', 'region_name', 'district_soato', 'district_name',
         ]
 
@@ -153,7 +176,9 @@ class MapDataSerializer(TranslatedNameMixin, serializers.ModelSerializer):
 
     def get_districts(self, obj):
         lang = get_current_language()
-        districts = obj.districts.prefetch_related('centers__mahalla').all()
+        districts = obj.districts.prefetch_related(
+            'centers__mahalla', 'centers__activity_types', 'centers__serving_mahallas'
+        ).all()
         result = []
         for district in districts:
             d_name = district.name
@@ -176,17 +201,47 @@ class MapDataSerializer(TranslatedNameMixin, serializers.ModelSerializer):
                     'id': c.id,
                     'name': c_name,
                     'category': c.category,
+                    'balance_holder': c.balance_holder,
+                    'has_own_building': c.has_own_building,
+                    'activity_types': [at.name for at in c.activity_types.all()],
                     'lat': c.lat,
                     'lng': c.lng,
                     'address': c.address,
-                    'director': c.director,
-                    'phone': c.phone,
-                    'employees': c.employees,
-                    'capacity': c.capacity,
+                    'map_url': c.map_url,
+                    # Obyekt haqida
+                    'circles_count': c.circles_count,
+                    'titled_teams_count': c.titled_teams_count,
+                    'library_activity_count': c.library_activity_count,
+                    # Hodimlar
+                    'management_staff': c.management_staff,
+                    'creative_staff': c.creative_staff,
+                    'technical_staff': c.technical_staff,
+                    'titled_team_staff': c.titled_team_staff,
+                    'total_employees': c.total_employees,
+                    # Obyekt tasnifi
+                    'total_land_area': c.total_land_area,
+                    'building_area': c.building_area,
+                    'buildings_count': c.buildings_count,
                     'built_year': c.built_year,
+                    'building_floors': c.building_floors,
                     'condition': c.condition,
-                    'area_sqm': c.area_sqm,
-                    'description': c.description,
+                    'building_technical_info': c.building_technical_info,
+                    'rooms_count': c.rooms_count,
+                    'auditorium_area': c.auditorium_area,
+                    'dining_area': c.dining_area,
+                    'restrooms_count': c.restrooms_count,
+                    'additional_buildings_count': c.additional_buildings_count,
+                    # Kommunikatsiyalar
+                    'has_heating': c.has_heating,
+                    'has_electricity': c.has_electricity,
+                    'has_gas': c.has_gas,
+                    'has_water': c.has_water,
+                    'has_sewerage': c.has_sewerage,
+                    'serving_mahallas': [
+                        {'id': sm.id, 'name': sm.name, 'tin': sm.tin}
+                        for sm in c.serving_mahallas.all()
+                    ],
+                    # Mahalla
                     'mahalla_id': c.mahalla.tin if c.mahalla else '',
                     'mahalla_name': m_name,
                     'mahalla_population': c.mahalla.population if c.mahalla else 0,

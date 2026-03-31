@@ -2,7 +2,7 @@ import json
 
 from django import forms
 from django.contrib import admin
-from .models import Region, District, Mahalla, CulturalCenter, CulturalCenterImage
+from .models import Region, District, Mahalla, CulturalCenter, CulturalCenterImage, ActivityType
 
 
 class DistrictInline(admin.TabularInline):
@@ -53,6 +53,12 @@ class MahallaAdmin(admin.ModelAdmin):
     raw_id_fields = ['district']
 
 
+@admin.register(ActivityType)
+class ActivityTypeAdmin(admin.ModelAdmin):
+    list_display = ['name']
+    search_fields = ['name']
+
+
 class CulturalCenterForm(forms.ModelForm):
     region = forms.ModelChoiceField(
         queryset=Region.objects.all(),
@@ -67,6 +73,8 @@ class CulturalCenterForm(forms.ModelForm):
         widgets = {
             'district': forms.Select(attrs={'id': 'id_district'}),
             'mahalla': forms.Select(attrs={'id': 'id_mahalla'}),
+            'activity_types': forms.CheckboxSelectMultiple(),
+            'serving_mahallas': forms.SelectMultiple(attrs={'id': 'id_serving_mahallas', 'size': 15}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -77,20 +85,26 @@ class CulturalCenterForm(forms.ModelForm):
             self.fields['region'].initial = region.id
             self.fields['district'].queryset = District.objects.filter(region=region)
             self.fields['mahalla'].queryset = Mahalla.objects.filter(district=self.instance.district)
+            self.fields['serving_mahallas'].queryset = Mahalla.objects.filter(district=self.instance.district)
         elif self.data.get('region'):
             try:
                 region_id = int(self.data.get('region'))
                 self.fields['district'].queryset = District.objects.filter(region_id=region_id)
+                pass
             except (ValueError, TypeError):
                 self.fields['district'].queryset = District.objects.none()
             try:
                 district_id = int(self.data.get('district'))
-                self.fields['mahalla'].queryset = Mahalla.objects.filter(district_id=district_id)
+                district_mahallas = Mahalla.objects.filter(district_id=district_id)
+                self.fields['mahalla'].queryset = district_mahallas
+                self.fields['serving_mahallas'].queryset = district_mahallas
             except (ValueError, TypeError):
                 self.fields['mahalla'].queryset = Mahalla.objects.none()
+                self.fields['serving_mahallas'].queryset = Mahalla.objects.none()
         else:
             self.fields['district'].queryset = District.objects.none()
             self.fields['mahalla'].queryset = Mahalla.objects.none()
+            self.fields['serving_mahallas'].queryset = Mahalla.objects.none()
 
 
 class CulturalCenterImageInline(admin.TabularInline):
@@ -104,26 +118,47 @@ class CulturalCenterAdmin(admin.ModelAdmin):
     form = CulturalCenterForm
     change_form_template = 'admin/centers/culturalcenter/change_form.html'
     list_display = [
-        'name', 'category', 'get_region', 'district', 'mahalla',
-        'condition', 'employees', 'capacity', 'built_year',
+        'name', 'category', 'get_region', 'district',
+        'condition', 'total_employees',
     ]
-    list_filter = ['category', 'condition', 'district__region']
-    search_fields = ['name', 'address', 'director', 'district__name', 'district__region__name']
+    list_filter = ['category', 'condition', 'district__region', 'activity_types']
+    search_fields = ['name', 'address', 'district__name', 'district__region__name']
     list_select_related = ['district', 'district__region', 'mahalla']
     inlines = [CulturalCenterImageInline]
     readonly_fields = ['created_at', 'updated_at']
     fieldsets = (
         ("Asosiy ma'lumotlar", {
-            'fields': ('name', 'category', 'region', 'district', 'mahalla', 'condition', 'image')
+            'fields': (
+                'name', 'category', 'balance_holder',
+                'region', 'district', 'mahalla', 'serving_mahallas',
+                'activity_types',
+                'has_own_building',
+                'image',
+            )
         }),
         ('Joylashuv', {
-            'fields': ('lat', 'lng', 'address')
+            'fields': ('lat', 'lng', 'address', 'map_url')
         }),
-        ("Boshqaruv ma'lumotlari", {
-            'fields': ('director', 'phone', 'employees', 'capacity', 'built_year', 'area_sqm')
+        ("Obyekt haqida ma'lumot", {
+            'fields': ('circles_count', 'titled_teams_count', 'library_activity_count')
         }),
-        ('Tavsif', {
-            'fields': ('description',)
+        ('Hodimlar', {
+            'fields': (
+                'management_staff', 'creative_staff',
+                'technical_staff', 'titled_team_staff',
+            )
+        }),
+        ('Obyekt tasnifi', {
+            'fields': (
+                'total_land_area', 'building_area', 'buildings_count',
+                'built_year', 'building_floors', 'condition',
+                'building_technical_info', 'rooms_count',
+                'auditorium_area', 'dining_area',
+                'restrooms_count', 'additional_buildings_count',
+            )
+        }),
+        ('Kommunikatsiyalar', {
+            'fields': ('has_heating', 'has_electricity', 'has_gas', 'has_water', 'has_sewerage'),
         }),
         ("Tizim ma'lumotlari", {
             'fields': ('created_at', 'updated_at'),
@@ -133,6 +168,10 @@ class CulturalCenterAdmin(admin.ModelAdmin):
     @admin.display(description="Viloyat", ordering='district__region__name')
     def get_region(self, obj):
         return obj.district.region.name
+
+    @admin.display(description="Hodimlar")
+    def total_employees(self, obj):
+        return obj.total_employees
 
     def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
         extra_context = extra_context or {}

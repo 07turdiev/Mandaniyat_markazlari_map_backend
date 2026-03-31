@@ -65,6 +65,19 @@ class Mahalla(models.Model):
         return self.name
 
 
+class ActivityType(models.Model):
+    """Faoliyat turi"""
+    name = models.CharField(max_length=200, verbose_name="Nomi")
+
+    class Meta:
+        verbose_name = "Faoliyat turi"
+        verbose_name_plural = "Faoliyat turlari"
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
 class CulturalCenter(models.Model):
     """Madaniyat markazi"""
 
@@ -82,6 +95,7 @@ class CulturalCenter(models.Model):
         ('Tamir talab', 'Tamir talab'),
     ]
 
+    # === Asosiy ma'lumotlar ===
     district = models.ForeignKey(
         District, on_delete=models.CASCADE, related_name='centers', verbose_name="Tuman"
     )
@@ -89,24 +103,59 @@ class CulturalCenter(models.Model):
         Mahalla, on_delete=models.SET_NULL, null=True, blank=True,
         related_name='centers', verbose_name="Mahalla"
     )
+    serving_mahallas = models.ManyToManyField(
+        Mahalla, blank=True, related_name='served_by_centers', verbose_name="Xizmat qiluvchi mahallalar"
+    )
     name = models.CharField(max_length=255, verbose_name="Nomi")
     name_ru = models.CharField(max_length=255, blank=True, verbose_name="Nomi (ruscha)")
     name_en = models.CharField(max_length=255, blank=True, verbose_name="Nomi (inglizcha)")
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, verbose_name="Kategoriya")
+    balance_holder = models.CharField(max_length=500, blank=True, verbose_name="Balansda saqlovchi")
+    activity_types = models.ManyToManyField(
+        ActivityType, blank=True, related_name='centers', verbose_name="Faoliyat turlari"
+    )
     lat = models.FloatField(verbose_name="Kenglik (latitude)")
     lng = models.FloatField(verbose_name="Uzunlik (longitude)")
     address = models.CharField(max_length=500, verbose_name="Manzil")
-    director = models.CharField(max_length=200, blank=True, verbose_name="Rahbar")
-    phone = models.CharField(max_length=50, blank=True, verbose_name="Telefon")
-    employees = models.PositiveIntegerField(default=0, verbose_name="Xodimlar soni")
-    capacity = models.PositiveIntegerField(default=0, verbose_name="Sig'imi")
-    built_year = models.PositiveIntegerField(null=True, blank=True, verbose_name="Qurilgan yili")
-    condition = models.CharField(
-        max_length=20, choices=CONDITION_CHOICES, default='Yaxshi', verbose_name="Holati"
-    )
-    area_sqm = models.PositiveIntegerField(default=0, verbose_name="Maydoni (kv.m)")
-    description = models.TextField(blank=True, verbose_name="Tavsif")
+    map_url = models.URLField(max_length=1000, blank=True, verbose_name="Xarita havolasi (Google/Yandex)")
+    has_own_building = models.BooleanField(default=True, verbose_name="O'z binosiga ega")
     image = models.ImageField(upload_to='centers/', blank=True, null=True, verbose_name="Rasm")
+
+    # === Obyekt haqida ma'lumot ===
+    circles_count = models.PositiveIntegerField(default=0, verbose_name="To'garaklar soni")
+    titled_teams_count = models.PositiveIntegerField(default=0, verbose_name="Unvonga ega jamoalar soni")
+    library_activity_count = models.PositiveIntegerField(default=0, verbose_name="Kutubxona faoliyat soni")
+
+    # === Hodimlar ===
+    management_staff = models.FloatField(default=0, verbose_name="Boshqaruv shtat birligi")
+    creative_staff = models.PositiveIntegerField(default=0, verbose_name="Ijodiy hodimlar soni")
+    technical_staff = models.PositiveIntegerField(default=0, verbose_name="Texnik xodimlar soni")
+    titled_team_staff = models.PositiveIntegerField(default=0, verbose_name="Unvonga ega jamoalar xodimlari soni")
+
+    # === Obyekt tasnifi ===
+    total_land_area = models.FloatField(default=0, verbose_name="Umumiy yer maydoni (ga)")
+    building_area = models.FloatField(default=0, verbose_name="Bino va inshoatlar maydoni (kv.m)")
+    buildings_count = models.PositiveIntegerField(default=0, verbose_name="Mavjud binolar soni")
+    built_year = models.PositiveIntegerField(null=True, blank=True, verbose_name="Binolar qurilgan yil")
+    building_floors = models.PositiveIntegerField(default=0, verbose_name="Bino qavati")
+    condition = models.CharField(
+        max_length=20, choices=CONDITION_CHOICES, default='Yaxshi', verbose_name="Bino holati"
+    )
+    building_technical_info = models.TextField(blank=True, verbose_name="Binoning texnik xarakteristikasi")
+    rooms_count = models.PositiveIntegerField(default=0, verbose_name="Xonalar soni")
+    auditorium_area = models.FloatField(default=0, verbose_name="Tomosha zali maydoni (kv.m)")
+    dining_area = models.FloatField(default=0, verbose_name="Ovqatlanish maydoni (kv.m)")
+    restrooms_count = models.PositiveIntegerField(default=0, verbose_name="Xojatxonalar soni")
+    additional_buildings_count = models.PositiveIntegerField(default=0, verbose_name="Qo'shimcha binolar soni")
+
+    # === Kommunikatsiyalar ===
+    has_heating = models.BooleanField(default=False, verbose_name="Isitish tizimi")
+    has_electricity = models.BooleanField(default=False, verbose_name="Elektro-energiya")
+    has_gas = models.BooleanField(default=False, verbose_name="Gaz")
+    has_water = models.BooleanField(default=False, verbose_name="Ichimlik suvi")
+    has_sewerage = models.BooleanField(default=False, verbose_name="Kanalizatsiya")
+
+    # === Tizim ===
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan sana")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Yangilangan sana")
 
@@ -121,6 +170,10 @@ class CulturalCenter(models.Model):
     @property
     def region(self):
         return self.district.region
+
+    @property
+    def total_employees(self):
+        return int(self.management_staff) + self.creative_staff + self.technical_staff + self.titled_team_staff
 
 
 class CulturalCenterImage(models.Model):
