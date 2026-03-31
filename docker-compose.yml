@@ -6,7 +6,7 @@ services:
     ports:
       - "8002:8002"
     volumes:
-      - ./db.sqlite3:/app/db.sqlite3
+      - db_data:/app/data
       - ./media:/app/media
       - static_files:/app/staticfiles
     environment:
@@ -14,3 +14,4 @@ services:
 
 volumes:
   static_files:
+  db_data:
