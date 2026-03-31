@@ -8,10 +8,9 @@ services:
     volumes:
       - db_data:/app/data
       - ./media:/app/media
-      - static_files:/app/staticfiles
+      - ./staticfiles:/app/staticfiles
     environment:
       - DJANGO_SETTINGS_MODULE=config.settings_prod
 
 volumes:
-  static_files:
   db_data:
