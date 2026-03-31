@@ -121,3 +121,21 @@ class CulturalCenter(models.Model):
     @property
     def region(self):
         return self.district.region
+
+
+class CulturalCenterImage(models.Model):
+    """Madaniyat markazi qo'shimcha rasmlari"""
+    center = models.ForeignKey(
+        CulturalCenter, on_delete=models.CASCADE, related_name='images', verbose_name="Markaz"
+    )
+    image = models.ImageField(upload_to='centers/gallery/', verbose_name="Rasm")
+    caption = models.CharField(max_length=255, blank=True, verbose_name="Izoh")
+    order = models.PositiveIntegerField(default=0, verbose_name="Tartib")
+
+    class Meta:
+        verbose_name = "Rasm"
+        verbose_name_plural = "Rasmlar"
+        ordering = ['order']
+
+    def __str__(self):
+        return f"{self.center.name} - rasm {self.order}"

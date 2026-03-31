@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Region, District, Mahalla, CulturalCenter
+from .models import Region, District, Mahalla, CulturalCenter, CulturalCenterImage
 from .middleware import get_current_language
 
 
@@ -25,23 +25,30 @@ class MahallaSerializer(TranslatedNameMixin, serializers.ModelSerializer):
         return self.get_translated_name(obj)
 
 
+class CulturalCenterImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CulturalCenterImage
+        fields = ['id', 'image', 'caption', 'order']
+
+
 class CulturalCenterSerializer(TranslatedNameMixin, serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
-    region_id = serializers.CharField(source='district.region.slug', read_only=True)
+    region_soato = serializers.CharField(source='district.region.soato', read_only=True)
     region_name = serializers.SerializerMethodField()
-    district_id = serializers.CharField(source='district.slug', read_only=True)
+    district_soato = serializers.CharField(source='district.soato', read_only=True)
     district_name = serializers.SerializerMethodField()
     mahalla_name = serializers.SerializerMethodField()
     mahalla_population = serializers.IntegerField(source='mahalla.population', read_only=True, default=0)
+    images = CulturalCenterImageSerializer(many=True, read_only=True)
 
     class Meta:
         model = CulturalCenter
         fields = [
             'id', 'name', 'category', 'lat', 'lng', 'address',
             'director', 'phone', 'employees', 'capacity', 'built_year',
-            'condition', 'area_sqm', 'description', 'image',
+            'condition', 'area_sqm', 'description', 'image', 'images',
             'mahalla', 'mahalla_name', 'mahalla_population',
-            'region_id', 'region_name', 'district_id', 'district_name',
+            'region_soato', 'region_name', 'district_soato', 'district_name',
         ]
 
     def get_name(self, obj):
@@ -136,7 +143,7 @@ class MapDataSerializer(TranslatedNameMixin, serializers.ModelSerializer):
 
     class Meta:
         model = Region
-        fields = ['id', 'name', 'population', 'center', 'districts']
+        fields = ['id', 'name', 'soato', 'population', 'center', 'districts']
 
     def get_name(self, obj):
         return self.get_translated_name(obj)
@@ -185,7 +192,7 @@ class MapDataSerializer(TranslatedNameMixin, serializers.ModelSerializer):
                     'mahalla_population': c.mahalla.population if c.mahalla else 0,
                 })
             result.append({
-                'id': district.slug,
+                'soato': district.soato,
                 'name': d_name,
                 'population': district.population,
                 'centers': centers,
@@ -194,5 +201,5 @@ class MapDataSerializer(TranslatedNameMixin, serializers.ModelSerializer):
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        ret['id'] = instance.slug
+        ret['soato'] = instance.soato
         return ret

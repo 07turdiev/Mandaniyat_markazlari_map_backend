@@ -2,7 +2,7 @@ import json
 
 from django import forms
 from django.contrib import admin
-from .models import Region, District, Mahalla, CulturalCenter
+from .models import Region, District, Mahalla, CulturalCenter, CulturalCenterImage
 
 
 class DistrictInline(admin.TabularInline):
@@ -93,6 +93,12 @@ class CulturalCenterForm(forms.ModelForm):
             self.fields['mahalla'].queryset = Mahalla.objects.none()
 
 
+class CulturalCenterImageInline(admin.TabularInline):
+    model = CulturalCenterImage
+    extra = 1
+    fields = ['image', 'caption', 'order']
+
+
 @admin.register(CulturalCenter)
 class CulturalCenterAdmin(admin.ModelAdmin):
     form = CulturalCenterForm
@@ -104,6 +110,7 @@ class CulturalCenterAdmin(admin.ModelAdmin):
     list_filter = ['category', 'condition', 'district__region']
     search_fields = ['name', 'address', 'director', 'district__name', 'district__region__name']
     list_select_related = ['district', 'district__region', 'mahalla']
+    inlines = [CulturalCenterImageInline]
     readonly_fields = ['created_at', 'updated_at']
     fieldsets = (
         ("Asosiy ma'lumotlar", {
