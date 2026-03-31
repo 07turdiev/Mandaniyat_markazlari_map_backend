@@ -1,5 +1,11 @@
 from rest_framework import serializers
-from .models import Region, District, CulturalCenter
+from .models import Region, District, Mahalla, CulturalCenter
+
+
+class MahallaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Mahalla
+        fields = ['id', 'name', 'tin', 'soato', 'code', 'population']
 
 
 class CulturalCenterSerializer(serializers.ModelSerializer):
@@ -7,6 +13,8 @@ class CulturalCenterSerializer(serializers.ModelSerializer):
     region_name = serializers.CharField(source='district.region.name', read_only=True)
     district_id = serializers.CharField(source='district.slug', read_only=True)
     district_name = serializers.CharField(source='district.name', read_only=True)
+    mahalla_name = serializers.CharField(source='mahalla.name', read_only=True, default='')
+    mahalla_population = serializers.IntegerField(source='mahalla.population', read_only=True, default=0)
 
     class Meta:
         model = CulturalCenter
@@ -14,7 +22,7 @@ class CulturalCenterSerializer(serializers.ModelSerializer):
             'id', 'name', 'category', 'lat', 'lng', 'address',
             'director', 'phone', 'employees', 'capacity', 'built_year',
             'condition', 'area_sqm', 'description', 'image',
-            'mahalla_id', 'mahalla_name', 'mahalla_population',
+            'mahalla', 'mahalla_name', 'mahalla_population',
             'region_id', 'region_name', 'district_id', 'district_name',
         ]
 
@@ -24,15 +32,16 @@ class DistrictSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = District
-        fields = ['id', 'slug', 'name', 'population', 'centers']
+        fields = ['id', 'slug', 'name', 'soato', 'population', 'centers']
 
 
 class DistrictListSerializer(serializers.ModelSerializer):
     center_count = serializers.IntegerField(read_only=True)
+    mahalla_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = District
-        fields = ['id', 'slug', 'name', 'population', 'center_count']
+        fields = ['id', 'slug', 'name', 'soato', 'population', 'center_count', 'mahalla_count']
 
 
 class RegionSerializer(serializers.ModelSerializer):
@@ -41,7 +50,7 @@ class RegionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Region
-        fields = ['id', 'slug', 'name', 'population', 'center', 'districts']
+        fields = ['id', 'slug', 'name', 'soato', 'population', 'center', 'districts']
 
     def get_center(self, obj):
         return [obj.center_lat, obj.center_lng]
@@ -54,7 +63,7 @@ class RegionListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Region
-        fields = ['id', 'slug', 'name', 'population', 'center', 'district_count', 'center_count']
+        fields = ['id', 'slug', 'name', 'soato', 'population', 'center', 'district_count', 'center_count']
 
     def get_center(self, obj):
         return [obj.center_lat, obj.center_lng]
@@ -69,14 +78,11 @@ class MapDataSerializer(serializers.ModelSerializer):
         model = Region
         fields = ['id', 'name', 'population', 'center', 'districts']
 
-    def get_id(self, obj):
-        return obj.slug
-
     def get_center(self, obj):
         return [obj.center_lat, obj.center_lng]
 
     def get_districts(self, obj):
-        districts = obj.districts.prefetch_related('centers').all()
+        districts = obj.districts.prefetch_related('centers__mahalla').all()
         result = []
         for district in districts:
             centers = []
@@ -96,9 +102,9 @@ class MapDataSerializer(serializers.ModelSerializer):
                     'condition': c.condition,
                     'area_sqm': c.area_sqm,
                     'description': c.description,
-                    'mahalla_id': c.mahalla_id,
-                    'mahalla_name': c.mahalla_name,
-                    'mahalla_population': c.mahalla_population,
+                    'mahalla_id': c.mahalla.tin if c.mahalla else '',
+                    'mahalla_name': c.mahalla.name if c.mahalla else '',
+                    'mahalla_population': c.mahalla.population if c.mahalla else 0,
                 })
             result.append({
                 'id': district.slug,

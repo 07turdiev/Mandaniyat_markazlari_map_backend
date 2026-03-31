@@ -3,11 +3,12 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.db.models import Count
 
-from .models import Region, District, CulturalCenter
+from .models import Region, District, Mahalla, CulturalCenter
 from .serializers import (
     RegionSerializer, RegionListSerializer,
     DistrictSerializer, DistrictListSerializer,
     CulturalCenterSerializer, MapDataSerializer,
+    MahallaSerializer,
 )
 
 
@@ -47,14 +48,32 @@ class DistrictViewSet(viewsets.ReadOnlyModelViewSet):
         if region_slug:
             qs = qs.filter(region__slug=region_slug)
         if self.action == 'list':
-            qs = qs.annotate(center_count=Count('centers'))
+            qs = qs.annotate(
+                center_count=Count('centers'),
+                mahalla_count=Count('mahallas'),
+            )
         else:
             qs = qs.prefetch_related('centers')
         return qs
 
 
+class MahallaViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Mahalla.objects.select_related('district', 'district__region')
+    serializer_class = MahallaSerializer
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        district = self.request.query_params.get('district')
+        region = self.request.query_params.get('region')
+        if district:
+            qs = qs.filter(district__soato=district)
+        elif region:
+            qs = qs.filter(district__region__soato=region)
+        return qs
+
+
 class CulturalCenterViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = CulturalCenter.objects.select_related('district', 'district__region')
+    queryset = CulturalCenter.objects.select_related('district', 'district__region', 'mahalla')
     serializer_class = CulturalCenterSerializer
 
     def get_queryset(self):

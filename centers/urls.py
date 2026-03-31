@@ -5,6 +5,7 @@ from . import views
 router = DefaultRouter()
 router.register(r'regions', views.RegionViewSet)
 router.register(r'districts', views.DistrictViewSet)
+router.register(r'mahallas', views.MahallaViewSet)
 router.register(r'centers', views.CulturalCenterViewSet)
 
 urlpatterns = [
