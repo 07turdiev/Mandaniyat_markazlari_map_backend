@@ -19,4 +19,5 @@ RUN python manage.py collectstatic --noinput
 
 EXPOSE 8002
 
-CMD ["gunicorn", "config.wsgi:application", "--bind", "0.0.0.0:8002", "--workers", "3", "--timeout", "120"]
+# Server ishga tushganda: avval aholi sonini yangilash, keyin gunicorn
+CMD python manage.py update_population && gunicorn config.wsgi:application --bind 0.0.0.0:8002 --workers 3 --timeout 120
