@@ -144,7 +144,7 @@ class CulturalCenter(models.Model):
     building_technical_info = models.TextField(blank=True, verbose_name="Binoning texnik xarakteristikasi")
     building_technical_info_ru = models.TextField(blank=True, verbose_name="Binoning texnik xarakteristikasi (ruscha)")
     rooms_count = models.PositiveIntegerField(default=0, verbose_name="Xonalar soni")
-    auditorium_area = models.FloatField(default=0, verbose_name="Tomosha zali maydoni (kv.m)")
+    auditorium_seats = models.PositiveIntegerField(default=0, verbose_name="Tomosha zali (o’rin)")
     dining_area = models.FloatField(default=0, verbose_name="Ovqatlanish maydoni (kv.m)")
     restrooms_count = models.PositiveIntegerField(default=0, verbose_name="Xojatxonalar soni")
     additional_buildings_count = models.PositiveIntegerField(default=0, verbose_name="Qo'shimcha binolar soni")

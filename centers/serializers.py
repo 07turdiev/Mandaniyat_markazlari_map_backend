@@ -67,7 +67,7 @@ class CulturalCenterSerializer(TranslatedNameMixin, serializers.ModelSerializer)
             'total_land_area', 'building_area', 'buildings_count',
             'built_year', 'building_floors', 'condition',
             'building_technical_info', 'rooms_count',
-            'auditorium_area', 'dining_area',
+            'auditorium_seats', 'dining_area',
             'restrooms_count', 'additional_buildings_count',
             # Kommunikatsiyalar
             'has_heating', 'has_electricity', 'has_gas', 'has_water', 'has_sewerage',
@@ -240,7 +240,7 @@ class MapDataSerializer(TranslatedNameMixin, serializers.ModelSerializer):
                     'condition': c.condition,
                     'building_technical_info': c.building_technical_info_ru if (lang == 'ru' and c.building_technical_info_ru) else c.building_technical_info,
                     'rooms_count': c.rooms_count,
-                    'auditorium_area': c.auditorium_area,
+                    'auditorium_seats': c.auditorium_seats,
                     'dining_area': c.dining_area,
                     'restrooms_count': c.restrooms_count,
                     'additional_buildings_count': c.additional_buildings_count,

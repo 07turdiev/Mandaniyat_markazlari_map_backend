@@ -154,7 +154,7 @@ class CulturalCenterAdmin(admin.ModelAdmin):
                 'total_land_area', 'building_area', 'buildings_count',
                 'built_year', 'building_floors', 'condition',
                 'building_technical_info', 'building_technical_info_ru', 'rooms_count',
-                'auditorium_area', 'dining_area',
+                'auditorium_seats', 'dining_area',
                 'restrooms_count', 'additional_buildings_count',
             )
         }),
