@@ -122,14 +122,15 @@ class CulturalCenterAdmin(admin.ModelAdmin):
         'condition', 'total_employees',
     ]
     list_filter = ['category', 'condition', 'district__region', 'activity_types']
-    search_fields = ['name', 'address', 'district__name', 'district__region__name']
+    search_fields = ['name', 'district__name', 'district__region__name']
     list_select_related = ['district', 'district__region', 'mahalla']
     inlines = [CulturalCenterImageInline]
     readonly_fields = ['created_at', 'updated_at']
     fieldsets = (
         ("Asosiy ma'lumotlar", {
             'fields': (
-                'name', 'category', 'balance_holder',
+                'name', 'name_ru',
+                'category', 'balance_holder', 'balance_holder_ru',
                 'region', 'district', 'mahalla', 'serving_mahallas',
                 'activity_types',
                 'has_own_building',
@@ -137,7 +138,7 @@ class CulturalCenterAdmin(admin.ModelAdmin):
             )
         }),
         ('Joylashuv', {
-            'fields': ('lat', 'lng', 'address', 'map_url')
+            'fields': ('lat', 'lng', 'map_url')
         }),
         ("Obyekt haqida ma'lumot", {
             'fields': ('circles_count', 'titled_teams_count', 'library_activity_count')
@@ -152,7 +153,7 @@ class CulturalCenterAdmin(admin.ModelAdmin):
             'fields': (
                 'total_land_area', 'building_area', 'buildings_count',
                 'built_year', 'building_floors', 'condition',
-                'building_technical_info', 'rooms_count',
+                'building_technical_info', 'building_technical_info_ru', 'rooms_count',
                 'auditorium_area', 'dining_area',
                 'restrooms_count', 'additional_buildings_count',
             )

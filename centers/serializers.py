@@ -39,6 +39,7 @@ class CulturalCenterImageSerializer(serializers.ModelSerializer):
 
 class CulturalCenterSerializer(TranslatedNameMixin, serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
+    balance_holder = serializers.SerializerMethodField()
     region_soato = serializers.CharField(source='district.region.soato', read_only=True)
     region_name = serializers.SerializerMethodField()
     district_soato = serializers.CharField(source='district.soato', read_only=True)
@@ -48,13 +49,14 @@ class CulturalCenterSerializer(TranslatedNameMixin, serializers.ModelSerializer)
     images = CulturalCenterImageSerializer(many=True, read_only=True)
     activity_types = ActivityTypeSerializer(many=True, read_only=True)
     serving_mahallas = MahallaSerializer(many=True, read_only=True)
+    building_technical_info = serializers.SerializerMethodField()
     total_employees = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = CulturalCenter
         fields = [
             'id', 'name', 'category', 'balance_holder', 'activity_types',
-            'lat', 'lng', 'address', 'map_url',
+            'lat', 'lng', 'map_url',
             'has_own_building', 'image', 'images',
             # Obyekt haqida
             'circles_count', 'titled_teams_count', 'library_activity_count',
@@ -76,6 +78,18 @@ class CulturalCenterSerializer(TranslatedNameMixin, serializers.ModelSerializer)
 
     def get_name(self, obj):
         return self.get_translated_name(obj)
+
+    def get_balance_holder(self, obj):
+        lang = get_current_language()
+        if lang == 'ru' and obj.balance_holder_ru:
+            return obj.balance_holder_ru
+        return obj.balance_holder
+
+    def get_building_technical_info(self, obj):
+        lang = get_current_language()
+        if lang == 'ru' and obj.building_technical_info_ru:
+            return obj.building_technical_info_ru
+        return obj.building_technical_info
 
     def get_region_name(self, obj):
         lang = get_current_language()
@@ -201,12 +215,11 @@ class MapDataSerializer(TranslatedNameMixin, serializers.ModelSerializer):
                     'id': c.id,
                     'name': c_name,
                     'category': c.category,
-                    'balance_holder': c.balance_holder,
+                    'balance_holder': c.balance_holder_ru if (lang == 'ru' and c.balance_holder_ru) else c.balance_holder,
                     'has_own_building': c.has_own_building,
                     'activity_types': [at.name for at in c.activity_types.all()],
                     'lat': c.lat,
                     'lng': c.lng,
-                    'address': c.address,
                     'map_url': c.map_url,
                     # Obyekt haqida
                     'circles_count': c.circles_count,
@@ -225,7 +238,7 @@ class MapDataSerializer(TranslatedNameMixin, serializers.ModelSerializer):
                     'built_year': c.built_year,
                     'building_floors': c.building_floors,
                     'condition': c.condition,
-                    'building_technical_info': c.building_technical_info,
+                    'building_technical_info': c.building_technical_info_ru if (lang == 'ru' and c.building_technical_info_ru) else c.building_technical_info,
                     'rooms_count': c.rooms_count,
                     'auditorium_area': c.auditorium_area,
                     'dining_area': c.dining_area,

@@ -111,12 +111,12 @@ class CulturalCenter(models.Model):
     name_en = models.CharField(max_length=255, blank=True, verbose_name="Nomi (inglizcha)")
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, verbose_name="Kategoriya")
     balance_holder = models.CharField(max_length=500, blank=True, verbose_name="Balansda saqlovchi")
+    balance_holder_ru = models.CharField(max_length=500, blank=True, verbose_name="Balansda saqlovchi (ruscha)")
     activity_types = models.ManyToManyField(
         ActivityType, blank=True, related_name='centers', verbose_name="Faoliyat turlari"
     )
     lat = models.FloatField(verbose_name="Kenglik (latitude)")
     lng = models.FloatField(verbose_name="Uzunlik (longitude)")
-    address = models.CharField(max_length=500, verbose_name="Manzil")
     map_url = models.URLField(max_length=1000, blank=True, verbose_name="Xarita havolasi (Google/Yandex)")
     has_own_building = models.BooleanField(default=True, verbose_name="O'z binosiga ega")
     image = models.ImageField(upload_to='centers/', blank=True, null=True, verbose_name="Rasm")
@@ -142,6 +142,7 @@ class CulturalCenter(models.Model):
         max_length=20, choices=CONDITION_CHOICES, default='Yaxshi', verbose_name="Bino holati"
     )
     building_technical_info = models.TextField(blank=True, verbose_name="Binoning texnik xarakteristikasi")
+    building_technical_info_ru = models.TextField(blank=True, verbose_name="Binoning texnik xarakteristikasi (ruscha)")
     rooms_count = models.PositiveIntegerField(default=0, verbose_name="Xonalar soni")
     auditorium_area = models.FloatField(default=0, verbose_name="Tomosha zali maydoni (kv.m)")
     dining_area = models.FloatField(default=0, verbose_name="Ovqatlanish maydoni (kv.m)")
