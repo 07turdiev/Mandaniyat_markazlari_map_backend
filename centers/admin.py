@@ -148,7 +148,7 @@ class CulturalCenterAdmin(admin.ModelAdmin):
             )
         }),
         ('Joylashuv', {
-            'fields': ('lat', 'lng', 'map_url')
+            'fields': ('lat', 'lng')
         }),
         ("Obyekt haqida ma'lumot", {
             'fields': ('circles_count', 'titled_teams_count', 'library_activity_count')
@@ -183,6 +183,7 @@ class CulturalCenterAdmin(admin.ModelAdmin):
     @admin.display(description="Hodimlar")
     def total_employees(self, obj):
         return obj.total_employees
+
 
     def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
         extra_context = extra_context or {}

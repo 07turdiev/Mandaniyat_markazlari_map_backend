@@ -40,6 +40,7 @@ class CulturalCenterImageSerializer(serializers.ModelSerializer):
 class CulturalCenterSerializer(TranslatedNameMixin, serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
     balance_holder = serializers.SerializerMethodField()
+    map_url = serializers.SerializerMethodField()
     region_soato = serializers.CharField(source='district.region.soato', read_only=True)
     region_name = serializers.SerializerMethodField()
     district_soato = serializers.CharField(source='district.soato', read_only=True)
@@ -78,6 +79,9 @@ class CulturalCenterSerializer(TranslatedNameMixin, serializers.ModelSerializer)
 
     def get_name(self, obj):
         return self.get_translated_name(obj)
+
+    def get_map_url(self, obj):
+        return f'https://www.google.com/maps?q={obj.lat},{obj.lng}'
 
     def get_balance_holder(self, obj):
         lang = get_current_language()
@@ -220,7 +224,7 @@ class MapDataSerializer(TranslatedNameMixin, serializers.ModelSerializer):
                     'activity_types': [at.name for at in c.activity_types.all()],
                     'lat': c.lat,
                     'lng': c.lng,
-                    'map_url': c.map_url,
+                    'map_url': f'https://www.google.com/maps?q={c.lat},{c.lng}',
                     # Obyekt haqida
                     'circles_count': c.circles_count,
                     'titled_teams_count': c.titled_teams_count,

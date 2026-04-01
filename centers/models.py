@@ -117,7 +117,6 @@ class CulturalCenter(models.Model):
     )
     lat = models.FloatField(verbose_name="Kenglik (latitude)")
     lng = models.FloatField(verbose_name="Uzunlik (longitude)")
-    map_url = models.URLField(max_length=1000, blank=True, verbose_name="Xarita havolasi (Google/Yandex)")
     has_own_building = models.BooleanField(default=True, verbose_name="O'z binosiga ega")
     image = models.ImageField(upload_to='centers/', blank=True, null=True, verbose_name="Rasm")
 
