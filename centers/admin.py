@@ -112,6 +112,15 @@ class CulturalCenterImageInline(admin.TabularInline):
     extra = 1
     fields = ['image', 'caption', 'order']
 
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
+        if obj:
+            last_order = obj.images.order_by('-order').values_list('order', flat=True).first()
+            formset.form.base_fields['order'].initial = (last_order or 0) + 1
+        else:
+            formset.form.base_fields['order'].initial = 1
+        return formset
+
 
 @admin.register(CulturalCenter)
 class CulturalCenterAdmin(admin.ModelAdmin):
@@ -134,7 +143,6 @@ class CulturalCenterAdmin(admin.ModelAdmin):
                 'region', 'district', 'mahalla', 'serving_mahallas',
                 'activity_types',
                 'has_own_building',
-                'image',
             )
         }),
         ('Joylashuv', {
