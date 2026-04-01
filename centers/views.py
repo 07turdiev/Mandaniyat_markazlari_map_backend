@@ -222,6 +222,27 @@ def statistics(request):
 
 
 @staff_member_required
+def ajax_translate(request):
+    """Admin panel uchun: o'zbekchadan ruschaga tarjima"""
+    import json
+    from .translation import translate_text
+
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST only'}, status=405)
+    try:
+        body = json.loads(request.body)
+        text = body.get('text', '').strip()
+    except (json.JSONDecodeError, AttributeError):
+        return JsonResponse({'error': 'Invalid JSON'}, status=400)
+
+    if not text:
+        return JsonResponse({'translated': ''})
+
+    translated = translate_text(text)
+    return JsonResponse({'translated': translated or ''})
+
+
+@staff_member_required
 def ajax_districts(request, region_id):
     """Admin panel uchun: viloyatga tegishli tumanlar"""
     districts = District.objects.filter(region_id=region_id).order_by('name').values('id', 'name')

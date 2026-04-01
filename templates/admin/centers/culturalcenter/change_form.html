@@ -122,6 +122,49 @@ window.addEventListener('load', function() {
             });
         }
 
+        // === Avtomatik tarjima (UZ → RU) ===
+        var TRANSLATE_PAIRS = [
+            {source: '#id_name', target: '#id_name_ru'},
+            {source: '#id_balance_holder', target: '#id_balance_holder_ru'},
+            {source: '#id_building_technical_info', target: '#id_building_technical_info_ru'}
+        ];
+
+        var translateTimers = {};
+
+        function autoTranslate(sourceId, $target, text) {
+            if (!text.trim()) {
+                return;
+            }
+            $.ajax({
+                url: '/api/ajax/translate/',
+                method: 'POST',
+                contentType: 'application/json',
+                headers: {'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value},
+                data: JSON.stringify({text: text}),
+                success: function(data) {
+                    if (data.translated) {
+                        $target.val(data.translated);
+                        $target.css('background-color', '#e8f5e9');
+                        setTimeout(function() { $target.css('background-color', ''); }, 1500);
+                    }
+                }
+            });
+        }
+
+        TRANSLATE_PAIRS.forEach(function(pair) {
+            var $source = $(pair.source);
+            var $target = $(pair.target);
+            if (!$source.length || !$target.length) return;
+
+            $source.on('input change', function() {
+                var text = $source.val();
+                clearTimeout(translateTimers[pair.source]);
+                translateTimers[pair.source] = setTimeout(function() {
+                    autoTranslate(pair.source, $target, text);
+                }, 800);
+            });
+        });
+
         console.log('[CASCADE] Tayyor!');
     }, 1000);
 });

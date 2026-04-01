@@ -28,6 +28,7 @@ class RegionAdmin(admin.ModelAdmin):
         return CulturalCenter.objects.filter(district__region=obj).count()
 
 
+
 @admin.register(District)
 class DistrictAdmin(admin.ModelAdmin):
     list_display = ['name', 'region', 'soato', 'population', 'mahalla_count', 'center_count']
@@ -42,6 +43,7 @@ class DistrictAdmin(admin.ModelAdmin):
     @admin.display(description="Markazlar")
     def center_count(self, obj):
         return obj.centers.count()
+
 
 
 @admin.register(Mahalla)
