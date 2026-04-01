@@ -145,7 +145,7 @@ class MahallaViewSet(viewsets.ReadOnlyModelViewSet):
                 name='category',
                 description="Kategoriya bo'yicha filtrlash",
                 type=str,
-                enum=['vazirlik', 'hokimlik', 'dxsh', 'sotiladi'],
+                enum=['vazirlik', 'hokimlik', 'dxsh', 'tugatiladi'],
             ),
         ],
     ),

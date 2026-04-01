@@ -85,7 +85,7 @@ class CulturalCenter(models.Model):
         ('vazirlik', 'Vazirlik'),
         ('hokimlik', 'Hokimlik'),
         ('dxsh', 'DXSh'),
-        ('sotiladi', 'Sotiladi'),
+        ('tugatiladi', 'Tugatiladi'),
     ]
 
     CONDITION_CHOICES = [
