@@ -85,30 +85,40 @@ window.addEventListener('load', function() {
             ];
 
             function toggleBuilding() {
-                var disabled = !$cb.is(':checked');
+                var hide = !$cb.is(':checked');
                 buildingFields.forEach(function(sel) {
                     var $el = $(sel);
-                    $el.prop('disabled', disabled);
-                    $el.closest('.form-group, .form-row, tr').css('opacity', disabled ? '0.4' : '1');
+                    $el.closest('.form-group, .form-row, tr').css({
+                        opacity: hide ? '0.3' : '1',
+                        pointerEvents: hide ? 'none' : ''
+                    });
                 });
                 // Asosiy rasm
                 var $img = $('#id_image');
-                $img.prop('disabled', disabled);
-                $img.closest('.form-group, .form-row').css('opacity', disabled ? '0.4' : '1');
+                $img.closest('.form-group, .form-row').css({
+                    opacity: hide ? '0.3' : '1',
+                    pointerEvents: hide ? 'none' : ''
+                });
                 // Rasmlar inline
                 $('.inline-group').each(function() {
-                    $(this).find('input, select, textarea, button, a.inline-deletelink').prop('disabled', disabled);
-                    $(this).css('opacity', disabled ? '0.4' : '1');
-                    if (disabled) {
-                        $(this).find('a').css('pointer-events', 'none');
-                    } else {
-                        $(this).find('a').css('pointer-events', '');
-                    }
+                    $(this).css({
+                        opacity: hide ? '0.3' : '1',
+                        pointerEvents: hide ? 'none' : ''
+                    });
                 });
             }
 
             $cb.on('change', toggleBuilding);
             toggleBuilding();
+
+            // Saqlash oldidan barcha maydonlarni enabled qilish
+            $('form').on('submit', function() {
+                buildingFields.forEach(function(sel) {
+                    $(sel).prop('disabled', false);
+                });
+                $('#id_image').prop('disabled', false);
+                $('.inline-group').find('input, select, textarea').prop('disabled', false);
+            });
         }
 
         console.log('[CASCADE] Tayyor!');
