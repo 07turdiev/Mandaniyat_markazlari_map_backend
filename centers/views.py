@@ -243,6 +243,13 @@ def ajax_translate(request):
 
 
 @staff_member_required
+def ajax_centers_by_district(request, district_id):
+    """Admin panel uchun: tumanga tegishli markazlar (dublikat tekshirish uchun)"""
+    centers = CulturalCenter.objects.filter(district_id=district_id).values('id', 'name')
+    return JsonResponse(list(centers), safe=False)
+
+
+@staff_member_required
 def ajax_districts(request, region_id):
     """Admin panel uchun: viloyatga tegishli tumanlar"""
     districts = District.objects.filter(region_id=region_id).order_by('name').values('id', 'name')

@@ -14,6 +14,7 @@ urlpatterns = [
     path('statistics/', views.statistics, name='statistics'),
     # Admin AJAX endpointlari
     path('ajax/translate/', views.ajax_translate, name='ajax-translate'),
+    path('ajax/centers-by-district/<int:district_id>/', views.ajax_centers_by_district, name='ajax-centers-by-district'),
     path('ajax/districts/<int:region_id>/', views.ajax_districts, name='ajax-districts'),
     path('ajax/mahallas/<int:district_id>/', views.ajax_mahallas, name='ajax-mahallas'),
 ]

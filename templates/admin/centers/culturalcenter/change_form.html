@@ -165,6 +165,64 @@ window.addEventListener('load', function() {
             });
         });
 
+        // === Dublikat tekshirish ===
+        var $name = $('#id_name');
+        var districtCenters = [];  // tuman markazlari ro'yxati
+        var currentCenterId = '{{ original.pk|default:"" }}';
+        var $dupWarn = $('<div id="dup-warning" style="display:none; background:#fff3cd; border:1px solid #ffc107; color:#856404; padding:10px 15px; margin:5px 0; border-radius:4px; font-weight:bold; font-size:14px;"></div>');
+        $name.closest('.form-row, .form-group, td').after($dupWarn);
+
+        function extractNumber(text) {
+            var m = text.match(/(\d+)/);
+            return m ? m[1] : null;
+        }
+
+        function checkDuplicate() {
+            var name = $name.val();
+            var num = extractNumber(name || '');
+            if (!num || !districtCenters.length) {
+                $dupWarn.hide();
+                return;
+            }
+            for (var i = 0; i < districtCenters.length; i++) {
+                var c = districtCenters[i];
+                if (currentCenterId && String(c.id) === currentCenterId) continue;
+                var cNum = extractNumber(c.name);
+                if (cNum === num) {
+                    $dupWarn.html('⚠️ Diqqat! Bu tumanda <b>"' + c.name + '"</b> nomli markaz allaqachon kiritilgan! (ID: ' + c.id + ')').show();
+                    return;
+                }
+            }
+            $dupWarn.hide();
+        }
+
+        function loadDistrictCenters(districtId) {
+            districtCenters = [];
+            $dupWarn.hide();
+            if (!districtId) return;
+            $.getJSON('/api/ajax/centers-by-district/' + districtId + '/', function(data) {
+                districtCenters = data;
+                checkDuplicate();
+            });
+        }
+
+        // Tuman o'zgarganda markazlarni yuklash
+        var origDistrictChange = $d[0].onchange;
+        $d[0].onchange = function() {
+            if (origDistrictChange) origDistrictChange.call(this);
+            loadDistrictCenters(this.value);
+        };
+
+        // Nom yozilganda tekshirish
+        $name.on('input', function() {
+            checkDuplicate();
+        });
+
+        // Sahifa yuklanganda tuman tanlangan bo'lsa
+        if ($d.val()) {
+            loadDistrictCenters($d.val());
+        }
+
         console.log('[CASCADE] Tayyor!');
     }, 1000);
 });
