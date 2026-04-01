@@ -100,7 +100,7 @@ class CulturalCenter(models.Model):
         District, on_delete=models.CASCADE, related_name='centers', verbose_name="Tuman"
     )
     mahalla = models.ForeignKey(
-        Mahalla, on_delete=models.SET_NULL, null=True, blank=True,
+        Mahalla, on_delete=models.SET_NULL, null=True,
         related_name='centers', verbose_name="Mahalla"
     )
     serving_mahallas = models.ManyToManyField(
