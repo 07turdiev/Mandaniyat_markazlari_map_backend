@@ -91,7 +91,7 @@ class CulturalCenter(models.Model):
     CONDITION_CHOICES = [
         ('Yaxshi', 'Yaxshi'),
         ("O'rtacha", "O'rtacha"),
-        ('Yomon', 'Yomon'),
+        ('Avariya holatida', 'Avariya holatida'),
         ('Tamir talab', 'Tamir talab'),
     ]
 

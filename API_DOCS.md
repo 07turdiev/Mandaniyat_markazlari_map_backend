@@ -177,14 +177,14 @@ GET /api/centers/{id}/                     # Tafsilot (rasmlar, mahallalar bilan
 | `vazirlik` | Vazirlik |
 | `hokimlik` | Hokimlik |
 | `dxsh` | DXSh |
-| `sotiladi` | Sotiladi |
+| `tugatiladi` | Tugatiladi |
 
 ### Bino holati (`condition`)
 | Qiymat | Ma'nosi |
 |--------|---------|
 | `Yaxshi` | Yaxshi |
 | `O'rtacha` | O'rtacha |
-| `Yomon` | Yomon |
+| `Avariya holatida` | Avariya holatida |
 | `Tamir talab` | Tamir talab |
 
 ### Boolean maydonlar
