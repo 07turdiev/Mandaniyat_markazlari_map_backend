@@ -82,6 +82,10 @@ class CulturalCenterForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        # Yangi markaz qo'shishda barcha faoliyat turlarini tanlangan qilish
+        if not self.instance.pk:
+            self.fields['activity_types'].initial = ActivityType.objects.values_list('id', flat=True)
+
         if self.instance and self.instance.pk and self.instance.district_id:
             region = self.instance.district.region
             self.fields['region'].initial = region.id
