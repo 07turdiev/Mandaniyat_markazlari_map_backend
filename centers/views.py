@@ -53,6 +53,7 @@ class RegionViewSet(viewsets.ReadOnlyModelViewSet):
             qs = qs.annotate(
                 district_count=Count('districts', distinct=True),
                 center_count=Count('districts__centers', distinct=True),
+                mahalla_count=Count('districts__mahallas', distinct=True),
             )
         else:
             qs = qs.prefetch_related('districts__centers')
@@ -209,12 +210,14 @@ def statistics(request):
     for cond_code, cond_name in CulturalCenter.CONDITION_CHOICES:
         by_condition[cond_code] = CulturalCenter.objects.filter(condition=cond_code).count()
 
+    total_mahallas = Mahalla.objects.count()
     total_population = sum(Region.objects.values_list('population', flat=True))
 
     return Response({
         'total_centers': total_centers,
         'total_regions': total_regions,
         'total_districts': total_districts,
+        'total_mahallas': total_mahallas,
         'total_population': total_population,
         'by_category': by_category,
         'by_condition': by_condition,

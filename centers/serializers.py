@@ -164,10 +164,11 @@ class RegionListSerializer(TranslatedNameMixin, serializers.ModelSerializer):
     center = serializers.SerializerMethodField()
     district_count = serializers.IntegerField(read_only=True)
     center_count = serializers.IntegerField(read_only=True)
+    mahalla_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Region
-        fields = ['id', 'slug', 'name', 'soato', 'population', 'center', 'district_count', 'center_count']
+        fields = ['id', 'slug', 'name', 'soato', 'population', 'center', 'district_count', 'center_count', 'mahalla_count']
 
     def get_name(self, obj):
         return self.get_translated_name(obj)
