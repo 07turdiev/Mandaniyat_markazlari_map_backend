@@ -127,9 +127,9 @@ class CulturalCenter(models.Model):
 
     # === Hodimlar ===
     management_staff = models.FloatField(default=0, verbose_name="Boshqaruv shtat birligi")
-    creative_staff = models.PositiveIntegerField(default=0, verbose_name="Ijodiy hodimlar soni")
-    technical_staff = models.PositiveIntegerField(default=0, verbose_name="Texnik xodimlar soni")
-    titled_team_staff = models.PositiveIntegerField(default=0, verbose_name="Unvonga ega jamoalar xodimlari soni")
+    creative_staff = models.FloatField(default=0, verbose_name="Ijodiy hodimlar soni")
+    technical_staff = models.FloatField(default=0, verbose_name="Texnik xodimlar soni")
+    titled_team_staff = models.FloatField(default=0, verbose_name="Unvonga ega jamoalar xodimlari soni")
 
     # === Obyekt tasnifi ===
     total_land_area = models.FloatField(default=0, verbose_name="Umumiy yer maydoni (ga)")
@@ -173,7 +173,7 @@ class CulturalCenter(models.Model):
 
     @property
     def total_employees(self):
-        return int(self.management_staff) + self.creative_staff + self.technical_staff + self.titled_team_staff
+        return self.management_staff + self.creative_staff + self.technical_staff + self.titled_team_staff
 
 
 class CulturalCenterImage(models.Model):
