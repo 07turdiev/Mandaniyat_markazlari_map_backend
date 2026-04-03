@@ -86,19 +86,13 @@ class CulturalCenterForm(forms.ModelForm):
         if not self.instance.pk:
             self.fields['activity_types'].initial = ActivityType.objects.values_list('id', flat=True)
 
-        if self.instance and self.instance.pk and self.instance.district_id:
-            region = self.instance.district.region
-            self.fields['region'].initial = region.id
-            self.fields['district'].queryset = District.objects.filter(region=region)
-            self.fields['mahalla'].queryset = Mahalla.objects.filter(district=self.instance.district)
-            self.fields['serving_mahallas'].queryset = Mahalla.objects.filter(district=self.instance.district)
-        elif self.data.get('region'):
+        if self.data.get('district'):
+            # POST yuborilganda — yuborilgan tuman asosida queryset qurish
             try:
                 region_id = int(self.data.get('region'))
                 self.fields['district'].queryset = District.objects.filter(region_id=region_id)
-                pass
             except (ValueError, TypeError):
-                self.fields['district'].queryset = District.objects.none()
+                self.fields['district'].queryset = District.objects.all()
             try:
                 district_id = int(self.data.get('district'))
                 district_mahallas = Mahalla.objects.filter(district_id=district_id)
@@ -107,6 +101,15 @@ class CulturalCenterForm(forms.ModelForm):
             except (ValueError, TypeError):
                 self.fields['mahalla'].queryset = Mahalla.objects.none()
                 self.fields['serving_mahallas'].queryset = Mahalla.objects.none()
+            if self.instance.pk and self.instance.district_id:
+                self.fields['region'].initial = self.data.get('region')
+        elif self.instance and self.instance.pk and self.instance.district_id:
+            # Mavjud markazni ochishda — saqlangan tuman asosida
+            region = self.instance.district.region
+            self.fields['region'].initial = region.id
+            self.fields['district'].queryset = District.objects.filter(region=region)
+            self.fields['mahalla'].queryset = Mahalla.objects.filter(district=self.instance.district)
+            self.fields['serving_mahallas'].queryset = Mahalla.objects.filter(district=self.instance.district)
         else:
             self.fields['district'].queryset = District.objects.none()
             self.fields['mahalla'].queryset = Mahalla.objects.none()
