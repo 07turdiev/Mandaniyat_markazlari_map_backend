@@ -2,7 +2,87 @@ import json
 
 from django import forms
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin, GroupAdmin as BaseGroupAdmin
+from django.contrib.auth.models import User, Group
 from .models import Region, District, Mahalla, CulturalCenter, CulturalCenterImage, ActivityType
+
+
+# ============================================================
+# Foydalanuvchilar va Rollar (Guruhlar) boshqaruvi
+# ============================================================
+
+admin.site.unregister(User)
+admin.site.unregister(Group)
+
+
+class GroupPermissionForm(forms.ModelForm):
+    """Faqat centers ilovasiga tegishli ruxsatlarni ko'rsatish"""
+
+    class Meta:
+        model = Group
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if 'permissions' in self.fields:
+            from django.contrib.auth.models import Permission
+            from django.contrib.contenttypes.models import ContentType
+
+            # Faqat centers ilovasi + auth modellari uchun ruxsatlar
+            allowed_apps = ['centers', 'auth']
+            ct_ids = ContentType.objects.filter(app_label__in=allowed_apps).values_list('id', flat=True)
+            self.fields['permissions'].queryset = Permission.objects.filter(
+                content_type_id__in=ct_ids
+            ).select_related('content_type')
+
+
+@admin.register(Group)
+class GroupAdmin(BaseGroupAdmin):
+    form = GroupPermissionForm
+    list_display = ['name', 'user_count', 'permission_count']
+
+    @admin.display(description="Foydalanuvchilar")
+    def user_count(self, obj):
+        return obj.user_set.count()
+
+    @admin.display(description="Ruxsatlar soni")
+    def permission_count(self, obj):
+        return obj.permissions.count()
+
+
+@admin.register(User)
+class UserAdmin(BaseUserAdmin):
+    list_display = ['username', 'first_name', 'last_name', 'is_active', 'is_staff', 'get_groups']
+    list_filter = ['is_staff', 'is_active', 'groups']
+
+    fieldsets = (
+        ("Kirish ma'lumotlari", {
+            'fields': ('username', 'password')
+        }),
+        ("Shaxsiy ma'lumotlar", {
+            'fields': ('first_name', 'last_name')
+        }),
+        ("Ruxsatlar", {
+            'fields': ('is_active', 'is_staff', 'groups'),
+            'description': "Foydalanuvchini guruhga qo'shing. Guruh orqali ruxsatlar beriladi.",
+        }),
+    )
+
+    add_fieldsets = (
+        ("Yangi foydalanuvchi", {
+            'classes': ('wide',),
+            'fields': ('username', 'first_name', 'last_name', 'password1', 'password2'),
+        }),
+        ("Ruxsatlar", {
+            'fields': ('is_active', 'is_staff', 'groups'),
+        }),
+    )
+
+    filter_horizontal = ['groups']
+
+    @admin.display(description="Guruhlar")
+    def get_groups(self, obj):
+        return ", ".join(g.name for g in obj.groups.all()) or "—"
 
 
 class DistrictInline(admin.TabularInline):

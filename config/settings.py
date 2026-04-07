@@ -130,12 +130,12 @@ JAZZMIN_SETTINGS = {
         'centers.ActivityType': 'fas fa-tags',
     },
     'order_with_respect_to': [
-        'auth',
         'centers.CulturalCenter',
         'centers.Mahalla',
         'centers.District',
         'centers.Region',
         'centers.ActivityType',
+        'auth',
     ],
     'default_icon_parents': 'fas fa-folder',
     'default_icon_children': 'fas fa-circle',
