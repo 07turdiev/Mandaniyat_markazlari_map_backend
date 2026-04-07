@@ -119,7 +119,7 @@ class CulturalCenter(models.Model):
     lat = models.FloatField(verbose_name="Kenglik (latitude)")
     lng = models.FloatField(verbose_name="Uzunlik (longitude)")
     has_own_building = models.BooleanField(default=True, verbose_name="O'z binosiga ega")
-    image = models.ImageField(upload_to='centers/', blank=True, null=True, verbose_name="Rasm")
+
 
     # === Obyekt haqida ma'lumot ===
     circles_count = models.PositiveIntegerField(default=0, verbose_name="To'garaklar soni")

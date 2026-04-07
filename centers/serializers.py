@@ -58,7 +58,7 @@ class CulturalCenterSerializer(TranslatedNameMixin, serializers.ModelSerializer)
         fields = [
             'id', 'name', 'category', 'balance_holder', 'activity_types',
             'lat', 'lng', 'map_url',
-            'has_own_building', 'image', 'images',
+            'has_own_building', 'images',
             # Obyekt haqida
             'circles_count', 'titled_teams_count', 'library_activity_count',
             # Hodimlar
