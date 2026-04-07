@@ -2,9 +2,59 @@ import json
 
 from django import forms
 from django.contrib import admin
+from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin, GroupAdmin as BaseGroupAdmin
 from django.contrib.auth.models import User, Group
-from .models import Region, District, Mahalla, CulturalCenter, CulturalCenterImage, ActivityType, AdminProfile
+from django.utils.html import format_html
+from .models import (
+    Region, District, Mahalla, CulturalCenter, CulturalCenterImage,
+    CulturalCenterProject, ActivityType, AdminProfile,
+)
+
+
+# ============================================================
+# Admin loglar
+# ============================================================
+
+ACTION_NAMES = {
+    ADDITION: "Qo'shdi",
+    CHANGE: "O'zgartirdi",
+    DELETION: "O'chirdi",
+}
+
+
+@admin.register(LogEntry)
+class LogEntryAdmin(admin.ModelAdmin):
+    list_display = ['action_time', 'user', 'get_action', 'content_type', 'get_object', 'get_change_message']
+    list_filter = ['action_flag', 'content_type', 'user']
+    search_fields = ['object_repr', 'change_message', 'user__username']
+    date_hierarchy = 'action_time'
+    list_per_page = 50
+    list_select_related = ['user', 'content_type']
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    @admin.display(description="Amal", ordering='action_flag')
+    def get_action(self, obj):
+        colors = {ADDITION: 'green', CHANGE: 'orange', DELETION: 'red'}
+        color = colors.get(obj.action_flag, 'gray')
+        label = ACTION_NAMES.get(obj.action_flag, '?')
+        return format_html('<span style="color: {}; font-weight: bold;">{}</span>', color, label)
+
+    @admin.display(description="Obyekt")
+    def get_object(self, obj):
+        return obj.object_repr
+
+    @admin.display(description="O'zgarishlar")
+    def get_change_message(self, obj):
+        return obj.get_change_message() or "—"
 
 
 # ============================================================
@@ -64,7 +114,7 @@ class AdminProfileInline(admin.StackedInline):
             'fields': (
                 'can_edit_basic', 'can_edit_location', 'can_edit_about',
                 'can_edit_staff', 'can_edit_classification', 'can_edit_utilities',
-                'can_edit_images',
+                'can_edit_images', 'can_edit_projects', 'can_edit_featured',
             ),
         }),
     )
@@ -239,18 +289,33 @@ class CulturalCenterImageInline(admin.TabularInline):
         return formset
 
 
+class CulturalCenterProjectInline(admin.TabularInline):
+    model = CulturalCenterProject
+    extra = 1
+    fields = ['title', 'media_type', 'file', 'caption', 'order']
+
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
+        if obj:
+            last_order = obj.projects.order_by('-order').values_list('order', flat=True).first()
+            formset.form.base_fields['order'].initial = (last_order or 0) + 1
+        else:
+            formset.form.base_fields['order'].initial = 1
+        return formset
+
+
 @admin.register(CulturalCenter)
 class CulturalCenterAdmin(admin.ModelAdmin):
     form = CulturalCenterForm
     change_form_template = 'admin/centers/culturalcenter/change_form.html'
     list_display = [
         'name', 'category', 'get_region', 'district',
-        'condition', 'total_employees',
+        'condition', 'total_employees', 'is_featured',
     ]
-    list_filter = ['category', 'condition', 'district__region', 'activity_types']
+    list_filter = ['category', 'condition', 'district__region', 'activity_types', 'is_featured']
     search_fields = ['name', 'district__name', 'district__region__name']
     list_select_related = ['district', 'district__region', 'mahalla']
-    inlines = [CulturalCenterImageInline]
+    inlines = [CulturalCenterImageInline, CulturalCenterProjectInline]
     readonly_fields = ['created_at', 'updated_at']
 
     # Bo'lim nomlari va ularga tegishli maydonlar
@@ -271,6 +336,7 @@ class CulturalCenterAdmin(admin.ModelAdmin):
             'restrooms_count', 'additional_buildings_count',
         ],
         'utilities': ['has_heating', 'has_electricity', 'has_gas', 'has_water', 'has_sewerage'],
+        'featured': ['is_featured'],
     }
 
     fieldsets = (
@@ -307,6 +373,9 @@ class CulturalCenterAdmin(admin.ModelAdmin):
         ('Kommunikatsiyalar', {
             'fields': ('has_heating', 'has_electricity', 'has_gas', 'has_water', 'has_sewerage'),
         }),
+        ('Ajratilgan markaz', {
+            'fields': ('is_featured',),
+        }),
         ("Tizim ma'lumotlari", {
             'fields': ('created_at', 'updated_at'),
         }),
@@ -319,11 +388,14 @@ class CulturalCenterAdmin(admin.ModelAdmin):
         return getattr(request.user, 'admin_profile', None)
 
     def get_inlines(self, request, obj=None):
-        """Rasmlar inline'ini profil asosida boshqarish"""
+        """Rasmlar va loyihalar inline'larini profil asosida boshqarish"""
         profile = self._get_profile(request)
-        if profile and not profile.can_edit_images:
-            return []
-        return [CulturalCenterImageInline]
+        inlines = []
+        if not profile or profile.can_edit_images:
+            inlines.append(CulturalCenterImageInline)
+        if not profile or profile.can_edit_projects:
+            inlines.append(CulturalCenterProjectInline)
+        return inlines
 
     def get_queryset(self, request):
         """Foydalanuvchining viloyati bo'yicha markazlarni filtrlash"""
@@ -345,6 +417,7 @@ class CulturalCenterAdmin(admin.ModelAdmin):
                 'staff': profile.can_edit_staff,
                 'classification': profile.can_edit_classification,
                 'utilities': profile.can_edit_utilities,
+                'featured': profile.can_edit_featured,
             }
             for section, can_edit in section_map.items():
                 if not can_edit:

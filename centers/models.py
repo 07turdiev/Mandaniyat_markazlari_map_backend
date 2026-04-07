@@ -156,6 +156,9 @@ class CulturalCenter(models.Model):
     has_water = models.BooleanField(default=False, verbose_name="Ichimlik suvi")
     has_sewerage = models.BooleanField(default=False, verbose_name="Kanalizatsiya")
 
+    # === Ajratilgan markaz ===
+    is_featured = models.BooleanField(default=False, verbose_name="Ajratilgan markaz")
+
     # === Tizim ===
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan sana")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Yangilangan sana")
@@ -195,6 +198,32 @@ class CulturalCenterImage(models.Model):
         return f"{self.center.name} - rasm {self.order}"
 
 
+class CulturalCenterProject(models.Model):
+    """Madaniyat markazi loyihalari (rasm va videolar)"""
+
+    MEDIA_TYPE_CHOICES = [
+        ('image', 'Rasm'),
+        ('video', 'Video'),
+    ]
+
+    center = models.ForeignKey(
+        CulturalCenter, on_delete=models.CASCADE, related_name='projects', verbose_name="Markaz"
+    )
+    title = models.CharField(max_length=255, verbose_name="Sarlavha")
+    media_type = models.CharField(max_length=10, choices=MEDIA_TYPE_CHOICES, default='image', verbose_name="Turi")
+    file = models.FileField(upload_to='centers/projects/', verbose_name="Fayl (rasm yoki video)")
+    caption = models.CharField(max_length=500, blank=True, verbose_name="Izoh")
+    order = models.PositiveIntegerField(default=0, verbose_name="Tartib")
+
+    class Meta:
+        verbose_name = "Loyiha"
+        verbose_name_plural = "Loyihalar"
+        ordering = ['order']
+
+    def __str__(self):
+        return f"{self.center.name} - {self.title}"
+
+
 class AdminProfile(models.Model):
     """Admin foydalanuvchi profili — viloyat va tahrirlash ruxsatlari"""
     user = models.OneToOneField(
@@ -213,6 +242,8 @@ class AdminProfile(models.Model):
     can_edit_classification = models.BooleanField(default=False, verbose_name="Obyekt tasnifi")
     can_edit_utilities = models.BooleanField(default=False, verbose_name="Kommunikatsiyalar")
     can_edit_images = models.BooleanField(default=False, verbose_name="Rasmlar")
+    can_edit_projects = models.BooleanField(default=False, verbose_name="Loyihalar")
+    can_edit_featured = models.BooleanField(default=False, verbose_name="Ajratilgan markaz")
 
     class Meta:
         verbose_name = "Admin profil"

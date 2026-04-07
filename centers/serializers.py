@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Region, District, Mahalla, CulturalCenter, CulturalCenterImage, ActivityType
+from .models import Region, District, Mahalla, CulturalCenter, CulturalCenterImage, CulturalCenterProject, ActivityType
 from .middleware import get_current_language
 
 
@@ -37,6 +37,12 @@ class CulturalCenterImageSerializer(serializers.ModelSerializer):
         fields = ['id', 'image', 'caption', 'order']
 
 
+class CulturalCenterProjectSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CulturalCenterProject
+        fields = ['id', 'title', 'media_type', 'file', 'caption', 'order']
+
+
 class CulturalCenterSerializer(TranslatedNameMixin, serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
     balance_holder = serializers.SerializerMethodField()
@@ -48,6 +54,7 @@ class CulturalCenterSerializer(TranslatedNameMixin, serializers.ModelSerializer)
     mahalla_name = serializers.SerializerMethodField()
     mahalla_population = serializers.IntegerField(source='mahalla.population', read_only=True, default=0)
     images = CulturalCenterImageSerializer(many=True, read_only=True)
+    projects = CulturalCenterProjectSerializer(many=True, read_only=True)
     activity_types = ActivityTypeSerializer(many=True, read_only=True)
     serving_mahallas = MahallaSerializer(many=True, read_only=True)
     building_technical_info = serializers.SerializerMethodField()
@@ -58,7 +65,7 @@ class CulturalCenterSerializer(TranslatedNameMixin, serializers.ModelSerializer)
         fields = [
             'id', 'name', 'category', 'balance_holder', 'activity_types',
             'lat', 'lng', 'map_url',
-            'has_own_building', 'images',
+            'has_own_building', 'is_featured', 'images', 'projects',
             # Obyekt haqida
             'circles_count', 'titled_teams_count', 'library_activity_count',
             # Hodimlar
@@ -220,6 +227,7 @@ class MapDataSerializer(TranslatedNameMixin, serializers.ModelSerializer):
                     'id': c.id,
                     'name': c_name,
                     'category': c.category,
+                    'is_featured': c.is_featured,
                     'balance_holder': c.balance_holder_ru if (lang == 'ru' and c.balance_holder_ru) else c.balance_holder,
                     'has_own_building': c.has_own_building,
                     'activity_types': [at.name for at in c.activity_types.all()],
