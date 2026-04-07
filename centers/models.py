@@ -212,6 +212,7 @@ class AdminProfile(models.Model):
     can_edit_staff = models.BooleanField(default=True, verbose_name="Hodimlar")
     can_edit_classification = models.BooleanField(default=False, verbose_name="Obyekt tasnifi")
     can_edit_utilities = models.BooleanField(default=False, verbose_name="Kommunikatsiyalar")
+    can_edit_images = models.BooleanField(default=False, verbose_name="Rasmlar")
 
     class Meta:
         verbose_name = "Admin profil"

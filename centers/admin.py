@@ -64,6 +64,7 @@ class AdminProfileInline(admin.StackedInline):
             'fields': (
                 'can_edit_basic', 'can_edit_location', 'can_edit_about',
                 'can_edit_staff', 'can_edit_classification', 'can_edit_utilities',
+                'can_edit_images',
             ),
         }),
     )
@@ -316,6 +317,13 @@ class CulturalCenterAdmin(admin.ModelAdmin):
         if request.user.is_superuser:
             return None
         return getattr(request.user, 'admin_profile', None)
+
+    def get_inlines(self, request, obj=None):
+        """Rasmlar inline'ini profil asosida boshqarish"""
+        profile = self._get_profile(request)
+        if profile and not profile.can_edit_images:
+            return []
+        return [CulturalCenterImageInline]
 
     def get_queryset(self, request):
         """Foydalanuvchining viloyati bo'yicha markazlarni filtrlash"""
