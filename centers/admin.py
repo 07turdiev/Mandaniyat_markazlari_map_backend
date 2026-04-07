@@ -4,7 +4,7 @@ from django import forms
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin, GroupAdmin as BaseGroupAdmin
 from django.contrib.auth.models import User, Group
-from .models import Region, District, Mahalla, CulturalCenter, CulturalCenterImage, ActivityType
+from .models import Region, District, Mahalla, CulturalCenter, CulturalCenterImage, ActivityType, AdminProfile
 
 
 # ============================================================
@@ -50,10 +50,30 @@ class GroupAdmin(BaseGroupAdmin):
         return obj.permissions.count()
 
 
+class AdminProfileInline(admin.StackedInline):
+    model = AdminProfile
+    can_delete = False
+    verbose_name = "Admin profil"
+    verbose_name_plural = "Admin profil"
+    fieldsets = (
+        ("Viloyat cheklovi", {
+            'fields': ('region',),
+            'description': "Bo'sh qoldirilsa — barcha viloyatlardagi markazlarni ko'radi",
+        }),
+        ("Tahrirlash mumkin bo'lgan bo'limlar", {
+            'fields': (
+                'can_edit_basic', 'can_edit_location', 'can_edit_about',
+                'can_edit_staff', 'can_edit_classification', 'can_edit_utilities',
+            ),
+        }),
+    )
+
+
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
-    list_display = ['username', 'first_name', 'last_name', 'is_active', 'is_staff', 'get_groups']
+    list_display = ['username', 'first_name', 'last_name', 'is_active', 'is_staff', 'get_groups', 'get_region']
     list_filter = ['is_staff', 'is_active', 'groups']
+    inlines = [AdminProfileInline]
 
     fieldsets = (
         ("Kirish ma'lumotlari", {
@@ -83,6 +103,13 @@ class UserAdmin(BaseUserAdmin):
     @admin.display(description="Guruhlar")
     def get_groups(self, obj):
         return ", ".join(g.name for g in obj.groups.all()) or "—"
+
+    @admin.display(description="Viloyat")
+    def get_region(self, obj):
+        profile = getattr(obj, 'admin_profile', None)
+        if profile and profile.region:
+            return profile.region.name
+        return "Barchasi"
 
 
 class DistrictInline(admin.TabularInline):
@@ -224,6 +251,27 @@ class CulturalCenterAdmin(admin.ModelAdmin):
     list_select_related = ['district', 'district__region', 'mahalla']
     inlines = [CulturalCenterImageInline]
     readonly_fields = ['created_at', 'updated_at']
+
+    # Bo'lim nomlari va ularga tegishli maydonlar
+    SECTION_FIELDS = {
+        'basic': [
+            'name', 'name_ru', 'category', 'balance_holder', 'balance_holder_ru',
+            'region', 'district', 'mahalla', 'serving_mahallas',
+            'activity_types', 'has_own_building',
+        ],
+        'location': ['lat', 'lng'],
+        'about': ['circles_count', 'titled_teams_count', 'library_activity_count'],
+        'staff': ['management_staff', 'creative_staff', 'technical_staff', 'titled_team_staff'],
+        'classification': [
+            'total_land_area', 'building_area', 'buildings_count',
+            'built_year', 'building_floors', 'condition',
+            'building_technical_info', 'building_technical_info_ru', 'rooms_count',
+            'auditorium_seats', 'dining_area',
+            'restrooms_count', 'additional_buildings_count',
+        ],
+        'utilities': ['has_heating', 'has_electricity', 'has_gas', 'has_water', 'has_sewerage'],
+    }
+
     fieldsets = (
         ("Asosiy ma'lumotlar", {
             'fields': (
@@ -263,6 +311,38 @@ class CulturalCenterAdmin(admin.ModelAdmin):
         }),
     )
 
+    def _get_profile(self, request):
+        """Joriy foydalanuvchining admin profilini olish"""
+        if request.user.is_superuser:
+            return None
+        return getattr(request.user, 'admin_profile', None)
+
+    def get_queryset(self, request):
+        """Foydalanuvchining viloyati bo'yicha markazlarni filtrlash"""
+        qs = super().get_queryset(request)
+        profile = self._get_profile(request)
+        if profile and profile.region:
+            qs = qs.filter(district__region=profile.region)
+        return qs
+
+    def get_readonly_fields(self, request, obj=None):
+        """Profilda ruxsat berilmagan bo'limlar readonly bo'ladi"""
+        readonly = list(super().get_readonly_fields(request, obj))
+        profile = self._get_profile(request)
+        if profile:
+            section_map = {
+                'basic': profile.can_edit_basic,
+                'location': profile.can_edit_location,
+                'about': profile.can_edit_about,
+                'staff': profile.can_edit_staff,
+                'classification': profile.can_edit_classification,
+                'utilities': profile.can_edit_utilities,
+            }
+            for section, can_edit in section_map.items():
+                if not can_edit:
+                    readonly.extend(self.SECTION_FIELDS[section])
+        return readonly
+
     @admin.display(description="Viloyat", ordering='district__region__name')
     def get_region(self, obj):
         return obj.district.region.name
@@ -271,18 +351,27 @@ class CulturalCenterAdmin(admin.ModelAdmin):
     def total_employees(self, obj):
         return obj.total_employees
 
-
     def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
         extra_context = extra_context or {}
 
+        profile = self._get_profile(request)
+
+        districts_qs = District.objects.all().order_by('name')
+        mahallas_qs = Mahalla.objects.all().order_by('name')
+
+        # Viloyat bo'yicha cheklangan bo'lsa — faqat o'sha viloyat ma'lumotlari
+        if profile and profile.region:
+            districts_qs = districts_qs.filter(region=profile.region)
+            mahallas_qs = mahallas_qs.filter(district__region=profile.region)
+
         districts_by_region = {}
-        for d in District.objects.all().order_by('name'):
+        for d in districts_qs:
             districts_by_region.setdefault(d.region_id, []).append(
                 {'id': d.id, 'name': d.name}
             )
 
         mahallas_by_district = {}
-        for m in Mahalla.objects.all().order_by('name'):
+        for m in mahallas_qs:
             mahallas_by_district.setdefault(m.district_id, []).append(
                 {'id': m.id, 'name': m.name}
             )

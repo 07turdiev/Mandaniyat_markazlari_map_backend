@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 
 
@@ -192,3 +193,30 @@ class CulturalCenterImage(models.Model):
 
     def __str__(self):
         return f"{self.center.name} - rasm {self.order}"
+
+
+class AdminProfile(models.Model):
+    """Admin foydalanuvchi profili — viloyat va tahrirlash ruxsatlari"""
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
+        related_name='admin_profile', verbose_name="Foydalanuvchi"
+    )
+    region = models.ForeignKey(
+        Region, on_delete=models.SET_NULL, null=True, blank=True,
+        verbose_name="Viloyat",
+        help_text="Faqat shu viloyatdagi markazlarni ko'radi. Bo'sh = barcha viloyatlar"
+    )
+    can_edit_basic = models.BooleanField(default=True, verbose_name="Asosiy ma'lumotlar")
+    can_edit_location = models.BooleanField(default=False, verbose_name="Joylashuv")
+    can_edit_about = models.BooleanField(default=False, verbose_name="Obyekt haqida ma'lumot")
+    can_edit_staff = models.BooleanField(default=True, verbose_name="Hodimlar")
+    can_edit_classification = models.BooleanField(default=False, verbose_name="Obyekt tasnifi")
+    can_edit_utilities = models.BooleanField(default=False, verbose_name="Kommunikatsiyalar")
+
+    class Meta:
+        verbose_name = "Admin profil"
+        verbose_name_plural = "Admin profillar"
+
+    def __str__(self):
+        region_name = self.region.name if self.region else "Barcha viloyatlar"
+        return f"{self.user.username} — {region_name}"
