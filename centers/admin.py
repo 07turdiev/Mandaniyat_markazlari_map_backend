@@ -216,6 +216,37 @@ class UserAdmin(BaseUserAdmin):
         return "Barchasi"
 
 
+class ProfileReadOnlyMixin:
+    """
+    AdminProfile ga ega staff foydalanuvchilarga ko'rish ruxsatini beradi
+    (lekin tahrirlash/qo'shish/o'chirish faqat superuser uchun).
+
+    Buning yordamida administratorlar 403 xatosiz Region/District/Mahalla
+    ma'lumotlarini ko'ra oladi (CulturalCenter form'i ishlashi uchun zarur).
+    """
+
+    def _has_profile_access(self, request):
+        if request.user.is_superuser:
+            return True
+        return request.user.is_staff and hasattr(request.user, 'admin_profile')
+
+    def has_module_permission(self, request):
+        return self._has_profile_access(request)
+
+    def has_view_permission(self, request, obj=None):
+        return self._has_profile_access(request)
+
+    def has_change_permission(self, request, obj=None):
+        # Faqat superuser tahrirlay oladi (bu ma'lumotnoma)
+        return request.user.is_superuser
+
+    def has_add_permission(self, request):
+        return request.user.is_superuser
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+
 class DistrictInline(admin.TabularInline):
     model = District
     extra = 0
@@ -224,11 +255,19 @@ class DistrictInline(admin.TabularInline):
 
 
 @admin.register(Region)
-class RegionAdmin(admin.ModelAdmin):
+class RegionAdmin(ProfileReadOnlyMixin, admin.ModelAdmin):
     list_display = ['name', 'slug', 'soato', 'population', 'district_count', 'center_count']
     search_fields = ['name', 'soato']
     prepopulated_fields = {'slug': ('name',)}
     inlines = [DistrictInline]
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if not request.user.is_superuser:
+            profile = getattr(request.user, 'admin_profile', None)
+            if profile and profile.region:
+                qs = qs.filter(id=profile.region.id)
+        return qs
 
     @admin.display(description="Tumanlar soni")
     def district_count(self, obj):
@@ -241,11 +280,19 @@ class RegionAdmin(admin.ModelAdmin):
 
 
 @admin.register(District)
-class DistrictAdmin(admin.ModelAdmin):
+class DistrictAdmin(ProfileReadOnlyMixin, admin.ModelAdmin):
     list_display = ['name', 'region', 'soato', 'population', 'mahalla_count', 'center_count']
     list_filter = ['region']
     search_fields = ['name', 'soato', 'region__name']
     prepopulated_fields = {'slug': ('name',)}
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if not request.user.is_superuser:
+            profile = getattr(request.user, 'admin_profile', None)
+            if profile and profile.region:
+                qs = qs.filter(region=profile.region)
+        return qs
 
     @admin.display(description="Mahallalar")
     def mahalla_count(self, obj):
@@ -258,16 +305,24 @@ class DistrictAdmin(admin.ModelAdmin):
 
 
 @admin.register(Mahalla)
-class MahallaAdmin(admin.ModelAdmin):
+class MahallaAdmin(ProfileReadOnlyMixin, admin.ModelAdmin):
     list_display = ['name', 'district', 'tin', 'soato', 'population']
     list_filter = ['district__region', 'district']
     search_fields = ['name', 'tin', 'soato', 'name_ru']
     list_select_related = ['district', 'district__region']
     raw_id_fields = ['district']
 
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if not request.user.is_superuser:
+            profile = getattr(request.user, 'admin_profile', None)
+            if profile and profile.region:
+                qs = qs.filter(district__region=profile.region)
+        return qs
+
 
 @admin.register(ActivityType)
-class ActivityTypeAdmin(admin.ModelAdmin):
+class ActivityTypeAdmin(ProfileReadOnlyMixin, admin.ModelAdmin):
     list_display = ['name']
     search_fields = ['name']
 
@@ -422,6 +477,28 @@ class CulturalCenterAdmin(admin.ModelAdmin):
             'fields': ('created_at', 'updated_at'),
         }),
     )
+
+    # === Permissions ===
+    def _has_profile_access(self, request):
+        if request.user.is_superuser:
+            return True
+        return request.user.is_staff and hasattr(request.user, 'admin_profile')
+
+    def has_module_permission(self, request):
+        return self._has_profile_access(request)
+
+    def has_view_permission(self, request, obj=None):
+        return self._has_profile_access(request)
+
+    def has_change_permission(self, request, obj=None):
+        return self._has_profile_access(request)
+
+    def has_add_permission(self, request):
+        return self._has_profile_access(request)
+
+    def has_delete_permission(self, request, obj=None):
+        # O'chirish faqat superuser uchun
+        return request.user.is_superuser
 
     def _get_profile(self, request):
         """Joriy foydalanuvchining admin profilini olish"""
