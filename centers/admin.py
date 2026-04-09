@@ -109,16 +109,30 @@ class GroupedCheckboxWidget(forms.Widget):
         super().__init__(attrs)
         self.sections = sections
 
-    def get_context(self, name, value, attrs):
-        context = super().get_context(name, value, attrs)
+    def render(self, name, value, attrs=None, renderer=None):
+        """Loyiha template loader orqali rendering — Django widget renderer'ini chetlab o'tish"""
+        from django.template.loader import render_to_string
         if value is None:
             value = []
-        context['widget']['sections'] = self.sections
-        context['widget']['selected'] = set(value)
-        return context
+        elif isinstance(value, str):
+            try:
+                import json
+                value = json.loads(value)
+            except (ValueError, TypeError):
+                value = []
+        context = {
+            'widget': {
+                'name': name,
+                'sections': self.sections,
+                'selected': set(value),
+            }
+        }
+        return render_to_string(self.template_name, context)
 
     def value_from_datadict(self, data, files, name):
-        return data.getlist(name)
+        if hasattr(data, 'getlist'):
+            return data.getlist(name)
+        return data.get(name, [])
 
 
 class AdminProfileForm(forms.ModelForm):
