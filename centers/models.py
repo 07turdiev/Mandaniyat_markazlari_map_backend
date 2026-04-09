@@ -225,7 +225,73 @@ class CulturalCenterProject(models.Model):
 
 
 class AdminProfile(models.Model):
-    """Admin foydalanuvchi profili — viloyat va tahrirlash ruxsatlari"""
+    """Admin foydalanuvchi profili — viloyat va maydon darajasida tahrirlash ruxsatlari"""
+
+    # CulturalCenter maydonlari bo'limlar bo'yicha guruhlangan
+    FIELD_SECTIONS = {
+        "Asosiy ma'lumotlar": [
+            ('name', "Nomi"),
+            ('name_ru', "Nomi (ruscha)"),
+            ('name_en', "Nomi (inglizcha)"),
+            ('category', "Kategoriya"),
+            ('balance_holder', "Balansda saqlovchi"),
+            ('balance_holder_ru', "Balansda saqlovchi (ruscha)"),
+            ('district', "Tuman"),
+            ('mahalla', "Mahalla"),
+            ('serving_mahallas', "Xizmat qiluvchi mahallalar"),
+            ('activity_types', "Faoliyat turlari"),
+            ('has_own_building', "O'z binosiga ega"),
+        ],
+        "Joylashuv": [
+            ('lat', "Kenglik (latitude)"),
+            ('lng', "Uzunlik (longitude)"),
+        ],
+        "Obyekt haqida ma'lumot": [
+            ('circles_count', "To'garaklar soni"),
+            ('titled_teams_count', "Unvonga ega jamoalar soni"),
+            ('library_activity_count', "Kutubxona faoliyat soni"),
+        ],
+        "Hodimlar": [
+            ('management_staff', "Boshqaruv shtat birligi"),
+            ('creative_staff', "Ijodiy hodimlar soni"),
+            ('technical_staff', "Texnik xodimlar soni"),
+            ('titled_team_staff', "Unvonga ega jamoalar xodimlari soni"),
+        ],
+        "Obyekt tasnifi": [
+            ('total_land_area', "Umumiy yer maydoni"),
+            ('building_area', "Bino maydoni"),
+            ('buildings_count', "Binolar soni"),
+            ('built_year', "Qurilgan yil"),
+            ('building_floors', "Bino qavati"),
+            ('condition', "Bino holati"),
+            ('building_technical_info', "Texnik xarakteristika"),
+            ('building_technical_info_ru', "Texnik xarakteristika (ruscha)"),
+            ('rooms_count', "Xonalar soni"),
+            ('auditorium_seats', "Tomosha zali o'rinlari"),
+            ('dining_area', "Ovqatlanish maydoni"),
+            ('restrooms_count', "Xojatxonalar soni"),
+            ('additional_buildings_count', "Qo'shimcha binolar soni"),
+        ],
+        "Kommunikatsiyalar": [
+            ('has_heating', "Isitish tizimi"),
+            ('has_electricity', "Elektro-energiya"),
+            ('has_gas', "Gaz"),
+            ('has_water', "Ichimlik suvi"),
+            ('has_sewerage', "Kanalizatsiya"),
+        ],
+        "Ajratilgan markaz": [
+            ('is_featured', "Ajratilgan markaz"),
+        ],
+    }
+
+    # Barcha maydon nomlari (tezkor tekshirish uchun)
+    ALL_FIELD_NAMES = []
+    FIELD_CHOICES = []
+    for _section, _fields in FIELD_SECTIONS.items():
+        for _name, _label in _fields:
+            ALL_FIELD_NAMES.append(_name)
+            FIELD_CHOICES.append((_name, _label))
+
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE,
         related_name='admin_profile', verbose_name="Foydalanuvchi"
@@ -235,15 +301,13 @@ class AdminProfile(models.Model):
         verbose_name="Viloyat",
         help_text="Faqat shu viloyatdagi markazlarni ko'radi. Bo'sh = barcha viloyatlar"
     )
-    can_edit_basic = models.BooleanField(default=True, verbose_name="Asosiy ma'lumotlar")
-    can_edit_location = models.BooleanField(default=False, verbose_name="Joylashuv")
-    can_edit_about = models.BooleanField(default=False, verbose_name="Obyekt haqida ma'lumot")
-    can_edit_staff = models.BooleanField(default=True, verbose_name="Hodimlar")
-    can_edit_classification = models.BooleanField(default=False, verbose_name="Obyekt tasnifi")
-    can_edit_utilities = models.BooleanField(default=False, verbose_name="Kommunikatsiyalar")
-    can_edit_images = models.BooleanField(default=False, verbose_name="Rasmlar")
-    can_edit_projects = models.BooleanField(default=False, verbose_name="Loyihalar")
-    can_edit_featured = models.BooleanField(default=False, verbose_name="Ajratilgan markaz")
+    allowed_fields = models.JSONField(
+        default=list, blank=True,
+        verbose_name="Tahrirlash mumkin bo'lgan maydonlar",
+        help_text="Tanlangan maydonlarni admin tahrirlashi mumkin. Tanlanmaganlar faqat o'qish uchun."
+    )
+    can_edit_images = models.BooleanField(default=False, verbose_name="Rasmlar qo'shish/tahrirlash")
+    can_edit_projects = models.BooleanField(default=False, verbose_name="Loyihalar qo'shish/tahrirlash")
 
     class Meta:
         verbose_name = "Admin profil"
@@ -252,3 +316,13 @@ class AdminProfile(models.Model):
     def __str__(self):
         region_name = self.region.name if self.region else "Barcha viloyatlar"
         return f"{self.user.username} — {region_name}"
+
+    def can_edit_field(self, field_name):
+        """Berilgan maydonni tahrirlash mumkinligini tekshirish"""
+        if not self.allowed_fields:
+            return False
+        return field_name in self.allowed_fields
+
+    def get_readonly_fields(self):
+        """Tahrirlash mumkin bo'lmagan maydonlar ro'yxati"""
+        return [name for name in self.ALL_FIELD_NAMES if name not in (self.allowed_fields or [])]

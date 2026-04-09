@@ -100,8 +100,47 @@ class GroupAdmin(BaseGroupAdmin):
         return obj.permissions.count()
 
 
+class GroupedCheckboxWidget(forms.Widget):
+    """Bo'limlar bo'yicha guruhlangan checkbox widget"""
+
+    template_name = 'admin/centers/widgets/grouped_checkboxes.html'
+
+    def __init__(self, sections, attrs=None):
+        super().__init__(attrs)
+        self.sections = sections
+
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        if value is None:
+            value = []
+        context['widget']['sections'] = self.sections
+        context['widget']['selected'] = set(value)
+        return context
+
+    def value_from_datadict(self, data, files, name):
+        return data.getlist(name)
+
+
+class AdminProfileForm(forms.ModelForm):
+    class Meta:
+        model = AdminProfile
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if 'allowed_fields' in self.fields:
+            self.fields['allowed_fields'].widget = GroupedCheckboxWidget(
+                sections=AdminProfile.FIELD_SECTIONS
+            )
+            self.fields['allowed_fields'].help_text = (
+                "Belgilangan maydonlarni admin tahrirlashi mumkin. "
+                "Belgilanmaganlar faqat o'qish uchun ko'rsatiladi."
+            )
+
+
 class AdminProfileInline(admin.StackedInline):
     model = AdminProfile
+    form = AdminProfileForm
     can_delete = False
     verbose_name = "Admin profil"
     verbose_name_plural = "Admin profil"
@@ -110,12 +149,12 @@ class AdminProfileInline(admin.StackedInline):
             'fields': ('region',),
             'description': "Bo'sh qoldirilsa — barcha viloyatlardagi markazlarni ko'radi",
         }),
-        ("Tahrirlash mumkin bo'lgan bo'limlar", {
-            'fields': (
-                'can_edit_basic', 'can_edit_location', 'can_edit_about',
-                'can_edit_staff', 'can_edit_classification', 'can_edit_utilities',
-                'can_edit_images', 'can_edit_projects', 'can_edit_featured',
-            ),
+        ("Madaniyat markazi maydonlari ruxsatlari", {
+            'fields': ('allowed_fields',),
+            'description': "Har bir maydonni alohida bloklash yoki ruxsat berish mumkin",
+        }),
+        ("Rasmlar va Loyihalar", {
+            'fields': ('can_edit_images', 'can_edit_projects'),
         }),
     )
 
@@ -318,31 +357,11 @@ class CulturalCenterAdmin(admin.ModelAdmin):
     inlines = [CulturalCenterImageInline, CulturalCenterProjectInline]
     readonly_fields = ['created_at', 'updated_at']
 
-    # Bo'lim nomlari va ularga tegishli maydonlar
-    SECTION_FIELDS = {
-        'basic': [
-            'name', 'name_ru', 'category', 'balance_holder', 'balance_holder_ru',
-            'region', 'district', 'mahalla', 'serving_mahallas',
-            'activity_types', 'has_own_building',
-        ],
-        'location': ['lat', 'lng'],
-        'about': ['circles_count', 'titled_teams_count', 'library_activity_count'],
-        'staff': ['management_staff', 'creative_staff', 'technical_staff', 'titled_team_staff'],
-        'classification': [
-            'total_land_area', 'building_area', 'buildings_count',
-            'built_year', 'building_floors', 'condition',
-            'building_technical_info', 'building_technical_info_ru', 'rooms_count',
-            'auditorium_seats', 'dining_area',
-            'restrooms_count', 'additional_buildings_count',
-        ],
-        'utilities': ['has_heating', 'has_electricity', 'has_gas', 'has_water', 'has_sewerage'],
-        'featured': ['is_featured'],
-    }
 
     fieldsets = (
         ("Asosiy ma'lumotlar", {
             'fields': (
-                'name', 'name_ru',
+                'name', 'name_ru', 'name_en',
                 'category', 'balance_holder', 'balance_holder_ru',
                 'region', 'district', 'mahalla', 'serving_mahallas',
                 'activity_types',
@@ -406,22 +425,11 @@ class CulturalCenterAdmin(admin.ModelAdmin):
         return qs
 
     def get_readonly_fields(self, request, obj=None):
-        """Profilda ruxsat berilmagan bo'limlar readonly bo'ladi"""
+        """Profilda ruxsat berilmagan maydonlar readonly bo'ladi (har bir maydon alohida)"""
         readonly = list(super().get_readonly_fields(request, obj))
         profile = self._get_profile(request)
         if profile:
-            section_map = {
-                'basic': profile.can_edit_basic,
-                'location': profile.can_edit_location,
-                'about': profile.can_edit_about,
-                'staff': profile.can_edit_staff,
-                'classification': profile.can_edit_classification,
-                'utilities': profile.can_edit_utilities,
-                'featured': profile.can_edit_featured,
-            }
-            for section, can_edit in section_map.items():
-                if not can_edit:
-                    readonly.extend(self.SECTION_FIELDS[section])
+            readonly.extend(profile.get_readonly_fields())
         return readonly
 
     @admin.display(description="Viloyat", ordering='district__region__name')

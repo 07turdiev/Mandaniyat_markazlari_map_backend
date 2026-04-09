@@ -1,0 +1,53 @@
+<div style="display: flex; flex-wrap: wrap; gap: 20px;">
+{% for section_name, fields in widget.sections.items %}
+<fieldset style="border: 1px solid #ccc; border-radius: 8px; padding: 12px 16px; min-width: 260px; flex: 1 1 260px; max-width: 400px;">
+    <legend style="font-weight: bold; font-size: 14px; color: #333; padding: 0 8px;">
+        {{ section_name }}
+        <label style="font-weight: normal; font-size: 12px; margin-left: 10px; color: #666; cursor: pointer;">
+            <input type="checkbox" class="section-toggle" data-section="section_{{ forloop.counter }}" style="margin-right: 4px;">
+            Barchasi
+        </label>
+    </legend>
+    {% for field_name, field_label in fields %}
+    <div style="padding: 3px 0;">
+        <label style="cursor: pointer; display: flex; align-items: center; gap: 6px;">
+            <input type="checkbox"
+                   name="{{ widget.name }}"
+                   value="{{ field_name }}"
+                   class="field-checkbox section_{{ forloop.parentloop.counter }}"
+                   {% if field_name in widget.selected %}checked{% endif %}
+                   style="width: 16px; height: 16px;">
+            <span style="font-size: 13px;">{{ field_label }}</span>
+            <code style="font-size: 11px; color: #999; margin-left: auto;">({{ field_name }})</code>
+        </label>
+    </div>
+    {% endfor %}
+</fieldset>
+{% endfor %}
+</div>
+
+<script>
+(function() {
+    // "Barchasi" toggle logikasi
+    document.querySelectorAll('.section-toggle').forEach(function(toggle) {
+        var sectionClass = toggle.dataset.section;
+        var checkboxes = document.querySelectorAll('.' + sectionClass);
+
+        // Boshlang'ich holatni tekshirish
+        var allChecked = Array.from(checkboxes).every(function(cb) { return cb.checked; });
+        toggle.checked = allChecked;
+
+        toggle.addEventListener('change', function() {
+            checkboxes.forEach(function(cb) {
+                cb.checked = toggle.checked;
+            });
+        });
+
+        checkboxes.forEach(function(cb) {
+            cb.addEventListener('change', function() {
+                toggle.checked = Array.from(checkboxes).every(function(c) { return c.checked; });
+            });
+        });
+    });
+})();
+</script>
