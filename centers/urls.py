@@ -13,6 +13,7 @@ urlpatterns = [
     path('map-data/', views.map_data, name='map-data'),
     path('statistics/', views.statistics, name='statistics'),
     path('slides/', views.slides_list, name='slides-list'),
+    path('guesthouse/', views.guesthouse_detail, name='guesthouse-detail'),
     # Admin AJAX endpointlari
     path('ajax/translate/', views.ajax_translate, name='ajax-translate'),
     path('ajax/centers-by-district/<int:district_id>/', views.ajax_centers_by_district, name='ajax-centers-by-district'),

@@ -267,6 +267,47 @@ class SlideImage(models.Model):
         return f"{self.slide.title} - rasm {self.order}"
 
 
+class GuestHouse(models.Model):
+    """Mehmonxona taqdimoti — faqat bitta yozuv"""
+    title = models.CharField(max_length=255, verbose_name="Nomi (lotin)")
+    title_uz = models.CharField(max_length=255, blank=True, default='', verbose_name="Nomi (kirill)")
+    title_ru = models.CharField(max_length=255, blank=True, default='', verbose_name="Nomi (ruscha)")
+    is_active = models.BooleanField(default=True, verbose_name="Faol")
+
+    class Meta:
+        verbose_name = "Mehmonxona"
+        verbose_name_plural = "Mehmonxona"
+
+    def __str__(self):
+        return self.title
+
+
+class GuestHouseMedia(models.Model):
+    """Mehmonxona rasmlari va videolari"""
+    MEDIA_CHOICES = [
+        ('image', 'Rasm'),
+        ('video', 'Video'),
+    ]
+    guest_house = models.ForeignKey(
+        GuestHouse, on_delete=models.CASCADE, related_name='media', verbose_name="Mehmonxona"
+    )
+    media_type = models.CharField(max_length=10, choices=MEDIA_CHOICES, default='image', verbose_name="Turi")
+    image = models.ImageField(upload_to='guesthouse/images/', blank=True, verbose_name="Rasm")
+    video = models.FileField(upload_to='guesthouse/videos/', blank=True, verbose_name="Video")
+    caption = models.CharField(max_length=255, blank=True, verbose_name="Izoh (lotin)")
+    caption_uz = models.CharField(max_length=255, blank=True, default='', verbose_name="Izoh (kirill)")
+    caption_ru = models.CharField(max_length=255, blank=True, default='', verbose_name="Izoh (ruscha)")
+    order = models.PositiveIntegerField(default=0, verbose_name="Tartib")
+
+    class Meta:
+        verbose_name = "Mehmonxona media"
+        verbose_name_plural = "Mehmonxona media"
+        ordering = ['order']
+
+    def __str__(self):
+        return f"{self.guest_house.title} - {self.media_type} {self.order}"
+
+
 class AdminProfile(models.Model):
     """Admin foydalanuvchi profili — viloyat va maydon darajasida tahrirlash ruxsatlari"""
 

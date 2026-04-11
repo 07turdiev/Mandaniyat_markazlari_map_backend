@@ -6,12 +6,12 @@ from django.http import JsonResponse
 from django.contrib.admin.views.decorators import staff_member_required
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
 
-from .models import Region, District, Mahalla, CulturalCenter, Slide
+from .models import Region, District, Mahalla, CulturalCenter, Slide, GuestHouse
 from .serializers import (
     RegionSerializer, RegionListSerializer,
     DistrictSerializer, DistrictListSerializer,
     CulturalCenterSerializer, MapDataSerializer,
-    MahallaSerializer, SlideSerializer,
+    MahallaSerializer, SlideSerializer, GuestHouseSerializer,
 )
 
 LANG_PARAM = OpenApiParameter(
@@ -234,6 +234,21 @@ def slides_list(request):
     """Faol Sliderlar ro'yxati"""
     slides = Slide.objects.filter(is_active=True).prefetch_related('images')
     serializer = SlideSerializer(slides, many=True, context={'request': request})
+    return Response(serializer.data)
+
+
+@extend_schema(
+    summary="Mehmonxona taqdimoti",
+    description="Mehmonxona ma'lumotlari va media fayllarini qaytaradi",
+    tags=['guesthouse'],
+)
+@api_view(['GET'])
+def guesthouse_detail(request):
+    """Mehmonxona taqdimoti"""
+    guesthouse = GuestHouse.objects.filter(is_active=True).prefetch_related('media').first()
+    if not guesthouse:
+        return Response(None)
+    serializer = GuestHouseSerializer(guesthouse, context={'request': request})
     return Response(serializer.data)
 
 
