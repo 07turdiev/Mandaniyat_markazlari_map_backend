@@ -6,12 +6,12 @@ from django.http import JsonResponse
 from django.contrib.admin.views.decorators import staff_member_required
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
 
-from .models import Region, District, Mahalla, CulturalCenter
+from .models import Region, District, Mahalla, CulturalCenter, Slide
 from .serializers import (
     RegionSerializer, RegionListSerializer,
     DistrictSerializer, DistrictListSerializer,
     CulturalCenterSerializer, MapDataSerializer,
-    MahallaSerializer,
+    MahallaSerializer, SlideSerializer,
 )
 
 LANG_PARAM = OpenApiParameter(
@@ -222,6 +222,19 @@ def statistics(request):
         'by_category': by_category,
         'by_condition': by_condition,
     })
+
+
+@extend_schema(
+    summary="Slidelar ro'yxati",
+    description="Harita tugmalari uchun faol slidelarni qaytaradi",
+    tags=['slides'],
+)
+@api_view(['GET'])
+def slides_list(request):
+    """Faol slidelar ro'yxati"""
+    slides = Slide.objects.filter(is_active=True).prefetch_related('images')
+    serializer = SlideSerializer(slides, many=True, context={'request': request})
+    return Response(serializer.data)
 
 
 @staff_member_required

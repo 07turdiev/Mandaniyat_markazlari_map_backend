@@ -126,9 +126,9 @@ class CulturalCenter(models.Model):
     titled_teams_count = models.PositiveIntegerField(default=0, verbose_name="Unvonga ega jamoalar soni")
     library_activity_count = models.PositiveIntegerField(default=0, verbose_name="Kutubxona faoliyat soni")
 
-    # === Hodimlar ===
+    # === xadimlar ===
     management_staff = models.FloatField(default=0, verbose_name="Boshqaruv shtat birligi")
-    creative_staff = models.FloatField(default=0, verbose_name="Ijodiy hodimlar soni")
+    creative_staff = models.FloatField(default=0, verbose_name="Ijodiy xadimlar soni")
     technical_staff = models.FloatField(default=0, verbose_name="Texnik xodimlar soni")
     titled_team_staff = models.FloatField(default=0, verbose_name="Unvonga ega jamoalar xodimlari soni")
 
@@ -224,6 +224,44 @@ class CulturalCenterProject(models.Model):
         return f"{self.center.name} - {self.title}"
 
 
+class Slide(models.Model):
+    """Slidelar — haritadagi tugmalarga bog'langan"""
+    title = models.CharField(max_length=255, verbose_name="Nomi")
+    button_label = models.CharField(max_length=100, verbose_name="Tugma matni")
+    order = models.PositiveIntegerField(default=0, verbose_name="Tartib")
+    is_active = models.BooleanField(default=True, verbose_name="Faol")
+
+    class Meta:
+        verbose_name = "Slide"
+        verbose_name_plural = "Slidelar"
+        ordering = ['order']
+
+    def __str__(self):
+        return self.title
+
+
+class SlideImage(models.Model):
+    """Slide ichidagi rasmlar va videolar"""
+    slide = models.ForeignKey(
+        Slide, on_delete=models.CASCADE, related_name='images', verbose_name="Slide"
+    )
+    image = models.ImageField(upload_to='slides/images/', verbose_name="Rasm")
+    video = models.FileField(
+        upload_to='slides/videos/', blank=True, verbose_name="Video",
+        help_text="Rasmga bog'langan video fayl (ixtiyoriy)"
+    )
+    caption = models.CharField(max_length=255, blank=True, verbose_name="Izoh")
+    order = models.PositiveIntegerField(default=0, verbose_name="Tartib")
+
+    class Meta:
+        verbose_name = "Slide rasmi"
+        verbose_name_plural = "Slide rasmlari"
+        ordering = ['order']
+
+    def __str__(self):
+        return f"{self.slide.title} - rasm {self.order}"
+
+
 class AdminProfile(models.Model):
     """Admin foydalanuvchi profili — viloyat va maydon darajasida tahrirlash ruxsatlari"""
 
@@ -251,9 +289,9 @@ class AdminProfile(models.Model):
             ('titled_teams_count', "Unvonga ega jamoalar soni"),
             ('library_activity_count', "Kutubxona faoliyat soni"),
         ],
-        "Hodimlar": [
+        "xadimlar": [
             ('management_staff', "Boshqaruv shtat birligi"),
-            ('creative_staff', "Ijodiy hodimlar soni"),
+            ('creative_staff', "Ijodiy xadimlar soni"),
             ('technical_staff', "Texnik xodimlar soni"),
             ('titled_team_staff', "Unvonga ega jamoalar xodimlari soni"),
         ],

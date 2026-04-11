@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
                 ('can_edit_basic', models.BooleanField(default=True, verbose_name="Asosiy ma'lumotlar")),
                 ('can_edit_location', models.BooleanField(default=False, verbose_name='Joylashuv')),
                 ('can_edit_about', models.BooleanField(default=False, verbose_name="Obyekt haqida ma'lumot")),
-                ('can_edit_staff', models.BooleanField(default=True, verbose_name='Hodimlar')),
+                ('can_edit_staff', models.BooleanField(default=True, verbose_name='xadimlar')),
                 ('can_edit_classification', models.BooleanField(default=False, verbose_name='Obyekt tasnifi')),
                 ('can_edit_utilities', models.BooleanField(default=False, verbose_name='Kommunikatsiyalar')),
                 ('region', models.ForeignKey(blank=True, help_text="Faqat shu viloyatdagi markazlarni ko'radi. Bo'sh = barcha viloyatlar", null=True, on_delete=django.db.models.deletion.SET_NULL, to='centers.region', verbose_name='Viloyat')),

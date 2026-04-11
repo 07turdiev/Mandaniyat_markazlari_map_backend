@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Region, District, Mahalla, CulturalCenter, CulturalCenterImage, CulturalCenterProject, ActivityType
+from .models import Region, District, Mahalla, CulturalCenter, CulturalCenterImage, CulturalCenterProject, ActivityType, Slide, SlideImage
 from .middleware import get_current_language
 
 
@@ -10,6 +10,9 @@ class TranslatedNameMixin:
         lang = get_current_language()
         if lang == 'uz':
             return obj.name
+        # uz-cyrl uchun name_uz maydonidan krill nomni olish
+        if lang == 'uz-cyrl':
+            return getattr(obj, 'name_uz', '') or obj.name
         field = f'name_{lang}'
         return getattr(obj, field, '') or obj.name
 
@@ -29,6 +32,20 @@ class ActivityTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityType
         fields = ['id', 'name']
+
+
+class SlideImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SlideImage
+        fields = ['id', 'image', 'video', 'caption', 'order']
+
+
+class SlideSerializer(serializers.ModelSerializer):
+    images = SlideImageSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Slide
+        fields = ['id', 'title', 'button_label', 'order', 'images']
 
 
 class CulturalCenterImageSerializer(serializers.ModelSerializer):
@@ -68,7 +85,7 @@ class CulturalCenterSerializer(TranslatedNameMixin, serializers.ModelSerializer)
             'has_own_building', 'is_featured', 'images', 'projects',
             # Obyekt haqida
             'circles_count', 'titled_teams_count', 'library_activity_count',
-            # Hodimlar
+            # xadimlar
             'management_staff', 'creative_staff', 'technical_staff',
             'titled_team_staff', 'total_employees',
             # Obyekt tasnifi
@@ -102,27 +119,27 @@ class CulturalCenterSerializer(TranslatedNameMixin, serializers.ModelSerializer)
             return obj.building_technical_info_ru
         return obj.building_technical_info
 
+    def _get_name_for_lang(self, obj, lang):
+        """Tilga qarab obyektdan nom olish"""
+        if lang == 'uz':
+            return obj.name
+        if lang == 'uz-cyrl':
+            return getattr(obj, 'name_uz', '') or obj.name
+        return getattr(obj, f'name_{lang}', '') or obj.name
+
     def get_region_name(self, obj):
         lang = get_current_language()
-        region = obj.district.region
-        if lang != 'uz':
-            return getattr(region, f'name_{lang}', '') or region.name
-        return region.name
+        return self._get_name_for_lang(obj.district.region, lang)
 
     def get_district_name(self, obj):
         lang = get_current_language()
-        district = obj.district
-        if lang != 'uz':
-            return getattr(district, f'name_{lang}', '') or district.name
-        return district.name
+        return self._get_name_for_lang(obj.district, lang)
 
     def get_mahalla_name(self, obj):
         if not obj.mahalla:
             return ''
         lang = get_current_language()
-        if lang != 'uz':
-            return getattr(obj.mahalla, f'name_{lang}', '') or obj.mahalla.name
-        return obj.mahalla.name
+        return self._get_name_for_lang(obj.mahalla, lang)
 
 
 class DistrictSerializer(TranslatedNameMixin, serializers.ModelSerializer):
@@ -200,6 +217,14 @@ class MapDataSerializer(TranslatedNameMixin, serializers.ModelSerializer):
     def get_center(self, obj):
         return [obj.center_lat, obj.center_lng]
 
+    def _resolve_name(self, obj, lang):
+        """Tilga qarab obyektdan nom olish"""
+        if lang == 'uz':
+            return obj.name
+        if lang == 'uz-cyrl':
+            return getattr(obj, 'name_uz', '') or obj.name
+        return getattr(obj, f'name_{lang}', '') or obj.name
+
     def get_districts(self, obj):
         lang = get_current_language()
         districts = obj.districts.prefetch_related(
@@ -207,21 +232,15 @@ class MapDataSerializer(TranslatedNameMixin, serializers.ModelSerializer):
         ).all()
         result = []
         for district in districts:
-            d_name = district.name
-            if lang != 'uz':
-                d_name = getattr(district, f'name_{lang}', '') or district.name
+            d_name = self._resolve_name(district, lang)
 
             centers = []
             for c in district.centers.all():
-                c_name = c.name
-                if lang != 'uz':
-                    c_name = getattr(c, f'name_{lang}', '') or c.name
+                c_name = self._resolve_name(c, lang)
 
                 m_name = ''
                 if c.mahalla:
-                    m_name = c.mahalla.name
-                    if lang != 'uz':
-                        m_name = getattr(c.mahalla, f'name_{lang}', '') or c.mahalla.name
+                    m_name = self._resolve_name(c.mahalla, lang)
 
                 centers.append({
                     'id': c.id,
@@ -238,7 +257,7 @@ class MapDataSerializer(TranslatedNameMixin, serializers.ModelSerializer):
                     'circles_count': c.circles_count,
                     'titled_teams_count': c.titled_teams_count,
                     'library_activity_count': c.library_activity_count,
-                    # Hodimlar
+                    # xadimlar
                     'management_staff': c.management_staff,
                     'creative_staff': c.creative_staff,
                     'technical_staff': c.technical_staff,
@@ -264,7 +283,7 @@ class MapDataSerializer(TranslatedNameMixin, serializers.ModelSerializer):
                     'has_water': c.has_water,
                     'has_sewerage': c.has_sewerage,
                     'serving_mahallas': [
-                        {'id': sm.id, 'name': sm.name, 'tin': sm.tin}
+                        {'id': sm.id, 'name': self._resolve_name(sm, lang), 'tin': sm.tin}
                         for sm in c.serving_mahallas.all()
                     ],
                     # Mahalla

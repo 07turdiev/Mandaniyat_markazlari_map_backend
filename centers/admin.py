@@ -8,7 +8,7 @@ from django.contrib.auth.models import User, Group
 from django.utils.html import format_html
 from .models import (
     Region, District, Mahalla, CulturalCenter, CulturalCenterImage,
-    CulturalCenterProject, ActivityType, AdminProfile,
+    CulturalCenterProject, ActivityType, AdminProfile, Slide, SlideImage,
 )
 
 
@@ -326,6 +326,34 @@ class ActivityTypeAdmin(ProfileReadOnlyMixin, admin.ModelAdmin):
     list_display = ['name']
     search_fields = ['name']
 
+class SlideImageInline(admin.TabularInline):
+    model = SlideImage
+    extra = 1
+    fields = ['image', 'video', 'caption', 'order']
+
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
+        if obj:
+            last_order = obj.images.order_by('-order').values_list('order', flat=True).first()
+            formset.form.base_fields['order'].initial = (last_order or 0) + 1
+        else:
+            formset.form.base_fields['order'].initial = 1
+        return formset
+
+
+@admin.register(Slide)
+class SlideAdmin(admin.ModelAdmin):
+    list_display = ['title', 'button_label', 'order', 'is_active', 'image_count']
+    list_filter = ['is_active']
+    list_editable = ['order', 'is_active']
+    search_fields = ['title', 'button_label']
+    fields = ['title', 'button_label', 'order', 'is_active']
+    inlines = [SlideImageInline]
+
+    @admin.display(description="Rasmlar soni")
+    def image_count(self, obj):
+        return obj.images.count()
+
 
 class CulturalCenterForm(forms.ModelForm):
     region = forms.ModelChoiceField(
@@ -452,7 +480,7 @@ class CulturalCenterAdmin(admin.ModelAdmin):
         ("Obyekt haqida ma'lumot", {
             'fields': ('circles_count', 'titled_teams_count', 'library_activity_count')
         }),
-        ('Hodimlar', {
+        ('xadimlar', {
             'fields': (
                 'management_staff', 'creative_staff',
                 'technical_staff', 'titled_team_staff',
@@ -536,7 +564,7 @@ class CulturalCenterAdmin(admin.ModelAdmin):
     def get_region(self, obj):
         return obj.district.region.name
 
-    @admin.display(description="Hodimlar")
+    @admin.display(description="xadimlar")
     def total_employees(self, obj):
         return obj.total_employees
 

@@ -73,7 +73,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='culturalcenter',
             name='creative_staff',
-            field=models.PositiveIntegerField(default=0, verbose_name='Ijodiy hodimlar soni'),
+            field=models.PositiveIntegerField(default=0, verbose_name='Ijodiy xadimlar soni'),
         ),
         migrations.AddField(
             model_name='culturalcenter',

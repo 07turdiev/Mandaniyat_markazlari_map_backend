@@ -371,11 +371,11 @@ GET /api/centers/{id}/
 | `has_water` | Ichimlik suvi |
 | `has_sewerage` | Kanalizatsiya |
 
-### Hodimlar (float — shtat birligi)
+### xadimlar (float — shtat birligi)
 | Maydon | Ma'nosi |
 |--------|---------|
 | `management_staff` | Boshqaruv shtat birligi |
-| `creative_staff` | Ijodiy hodimlar |
+| `creative_staff` | Ijodiy xadimlar |
 | `technical_staff` | Texnik xodimlar |
 | `titled_team_staff` | Unvonga ega jamoalar xodimlari |
 | `total_employees` | Jami (computed) |

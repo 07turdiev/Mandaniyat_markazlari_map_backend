@@ -128,6 +128,7 @@ JAZZMIN_SETTINGS = {
         'centers.District': 'fas fa-map-marker-alt',
         'centers.CulturalCenter': 'fas fa-landmark',
         'centers.ActivityType': 'fas fa-tags',
+        'centers.Slide': 'fas fa-images',
         'admin.LogEntry': 'fas fa-history',
     },
     'order_with_respect_to': [

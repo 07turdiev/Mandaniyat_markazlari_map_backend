@@ -2,7 +2,7 @@ import threading
 
 _thread_local = threading.local()
 
-SUPPORTED_LANGUAGES = ('uz', 'ru', 'en')
+SUPPORTED_LANGUAGES = ('uz', 'uz-cyrl', 'ru', 'en')
 DEFAULT_LANGUAGE = 'uz'
 
 
@@ -13,14 +13,19 @@ def get_current_language():
 class LanguageMiddleware:
     """
     Accept-Language headeridan tilni aniqlaydi.
-    Qo'llab-quvvatlanadigan tillar: uz, ru, en
+    Qo'llab-quvvatlanadigan tillar: uz, uz-cyrl, ru, en
     """
 
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
-        lang = request.headers.get('Accept-Language', DEFAULT_LANGUAGE)[:2].lower()
+        lang_header = request.headers.get('Accept-Language', DEFAULT_LANGUAGE).lower().strip()
+        # uz-cyrl ni to'liq qo'llab-quvvatlash
+        if lang_header.startswith('uz-cyrl'):
+            lang = 'uz-cyrl'
+        else:
+            lang = lang_header[:2]
         if lang not in SUPPORTED_LANGUAGES:
             lang = DEFAULT_LANGUAGE
         _thread_local.language = lang

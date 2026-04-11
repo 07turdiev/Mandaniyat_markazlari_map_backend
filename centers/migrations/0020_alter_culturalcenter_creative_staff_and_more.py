@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='culturalcenter',
             name='creative_staff',
-            field=models.FloatField(default=0, verbose_name='Ijodiy hodimlar soni'),
+            field=models.FloatField(default=0, verbose_name='Ijodiy xadimlar soni'),
         ),
         migrations.AlterField(
             model_name='culturalcenter',
