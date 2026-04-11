@@ -329,7 +329,7 @@ class ActivityTypeAdmin(ProfileReadOnlyMixin, admin.ModelAdmin):
 class SlideImageInline(admin.TabularInline):
     model = SlideImage
     extra = 1
-    fields = ['image', 'video', 'caption', 'caption_ru', 'caption_en', 'order']
+    fields = ['image', 'video', 'caption', 'caption_uz', 'caption_ru', 'order']
 
     def get_formset(self, request, obj=None, **kwargs):
         formset = super().get_formset(request, obj, **kwargs)
@@ -348,9 +348,9 @@ class SlideAdmin(admin.ModelAdmin):
     list_editable = ['order', 'is_active']
     search_fields = ['title', 'button_label']
     fieldsets = [
-        ("O'zbekcha", {'fields': ['title', 'button_label']}),
+        ("O'zbekcha (lotin)", {'fields': ['title', 'button_label']}),
+        ("O'zbekcha (kirill)", {'fields': ['title_uz', 'button_label_uz'], 'classes': ['collapse']}),
         ("Ruscha", {'fields': ['title_ru', 'button_label_ru'], 'classes': ['collapse']}),
-        ("Inglizcha", {'fields': ['title_en', 'button_label_en'], 'classes': ['collapse']}),
         ("Sozlamalar", {'fields': ['order', 'is_active']}),
     ]
     inlines = [SlideImageInline]

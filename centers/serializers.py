@@ -43,10 +43,10 @@ class SlideImageSerializer(serializers.ModelSerializer):
 
     def get_caption(self, obj):
         lang = get_current_language()
+        if lang == 'uz-cyrl' and obj.caption_uz:
+            return obj.caption_uz
         if lang == 'ru' and obj.caption_ru:
             return obj.caption_ru
-        if lang == 'en' and obj.caption_en:
-            return obj.caption_en
         return obj.caption
 
 
@@ -61,18 +61,18 @@ class SlideSerializer(serializers.ModelSerializer):
 
     def get_title(self, obj):
         lang = get_current_language()
+        if lang == 'uz-cyrl' and obj.title_uz:
+            return obj.title_uz
         if lang == 'ru' and obj.title_ru:
             return obj.title_ru
-        if lang == 'en' and obj.title_en:
-            return obj.title_en
         return obj.title
 
     def get_button_label(self, obj):
         lang = get_current_language()
+        if lang == 'uz-cyrl' and obj.button_label_uz:
+            return obj.button_label_uz
         if lang == 'ru' and obj.button_label_ru:
             return obj.button_label_ru
-        if lang == 'en' and obj.button_label_en:
-            return obj.button_label_en
         return obj.button_label
 
 
