@@ -226,8 +226,12 @@ class CulturalCenterProject(models.Model):
 
 class Slide(models.Model):
     """Slidelar — haritadagi tugmalarga bog'langan"""
-    title = models.CharField(max_length=255, verbose_name="Nomi")
-    button_label = models.CharField(max_length=100, verbose_name="Tugma matni")
+    title = models.CharField(max_length=255, verbose_name="Nomi (uz)")
+    title_ru = models.CharField(max_length=255, blank=True, default='', verbose_name="Nomi (ru)")
+    title_en = models.CharField(max_length=255, blank=True, default='', verbose_name="Nomi (en)")
+    button_label = models.CharField(max_length=100, verbose_name="Tugma matni (uz)")
+    button_label_ru = models.CharField(max_length=100, blank=True, default='', verbose_name="Tugma matni (ru)")
+    button_label_en = models.CharField(max_length=100, blank=True, default='', verbose_name="Tugma matni (en)")
     order = models.PositiveIntegerField(default=0, verbose_name="Tartib")
     is_active = models.BooleanField(default=True, verbose_name="Faol")
 
@@ -250,7 +254,9 @@ class SlideImage(models.Model):
         upload_to='slides/videos/', blank=True, verbose_name="Video",
         help_text="Rasmga bog'langan video fayl (ixtiyoriy)"
     )
-    caption = models.CharField(max_length=255, blank=True, verbose_name="Izoh")
+    caption = models.CharField(max_length=255, blank=True, verbose_name="Izoh (uz)")
+    caption_ru = models.CharField(max_length=255, blank=True, default='', verbose_name="Izoh (ru)")
+    caption_en = models.CharField(max_length=255, blank=True, default='', verbose_name="Izoh (en)")
     order = models.PositiveIntegerField(default=0, verbose_name="Tartib")
 
     class Meta:

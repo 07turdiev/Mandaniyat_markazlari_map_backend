@@ -78,6 +78,10 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# Fayl yuklash limiti (200 MB)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 200 * 1024 * 1024
+FILE_UPLOAD_MAX_MEMORY_SIZE = 200 * 1024 * 1024
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # CORS

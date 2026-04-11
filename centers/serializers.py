@@ -35,17 +35,45 @@ class ActivityTypeSerializer(serializers.ModelSerializer):
 
 
 class SlideImageSerializer(serializers.ModelSerializer):
+    caption = serializers.SerializerMethodField()
+
     class Meta:
         model = SlideImage
         fields = ['id', 'image', 'video', 'caption', 'order']
 
+    def get_caption(self, obj):
+        lang = get_current_language()
+        if lang == 'ru' and obj.caption_ru:
+            return obj.caption_ru
+        if lang == 'en' and obj.caption_en:
+            return obj.caption_en
+        return obj.caption
+
 
 class SlideSerializer(serializers.ModelSerializer):
     images = SlideImageSerializer(many=True, read_only=True)
+    title = serializers.SerializerMethodField()
+    button_label = serializers.SerializerMethodField()
 
     class Meta:
         model = Slide
         fields = ['id', 'title', 'button_label', 'order', 'images']
+
+    def get_title(self, obj):
+        lang = get_current_language()
+        if lang == 'ru' and obj.title_ru:
+            return obj.title_ru
+        if lang == 'en' and obj.title_en:
+            return obj.title_en
+        return obj.title
+
+    def get_button_label(self, obj):
+        lang = get_current_language()
+        if lang == 'ru' and obj.button_label_ru:
+            return obj.button_label_ru
+        if lang == 'en' and obj.button_label_en:
+            return obj.button_label_en
+        return obj.button_label
 
 
 class CulturalCenterImageSerializer(serializers.ModelSerializer):
