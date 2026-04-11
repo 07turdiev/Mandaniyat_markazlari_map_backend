@@ -225,13 +225,13 @@ def statistics(request):
 
 
 @extend_schema(
-    summary="Slidelar ro'yxati",
-    description="Harita tugmalari uchun faol slidelarni qaytaradi",
+    summary="Sliderlar ro'yxati",
+    description="Harita tugmalari uchun faol Sliderlarni qaytaradi",
     tags=['slides'],
 )
 @api_view(['GET'])
 def slides_list(request):
-    """Faol slidelar ro'yxati"""
+    """Faol Sliderlar ro'yxati"""
     slides = Slide.objects.filter(is_active=True).prefetch_related('images')
     serializer = SlideSerializer(slides, many=True, context={'request': request})
     return Response(serializer.data)

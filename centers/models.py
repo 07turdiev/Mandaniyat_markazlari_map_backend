@@ -224,7 +224,7 @@ class CulturalCenterProject(models.Model):
 
 
 class Slide(models.Model):
-    """Slidelar — haritadagi tugmalarga bog'langan"""
+    """Sliderlar — haritadagi tugmalarga bog'langan"""
     title = models.CharField(max_length=255, verbose_name="Nomi (lotin)")
     title_uz = models.CharField(max_length=255, blank=True, default='', verbose_name="Nomi (kirill)")
     title_ru = models.CharField(max_length=255, blank=True, default='', verbose_name="Nomi (ruscha)")
@@ -236,7 +236,7 @@ class Slide(models.Model):
 
     class Meta:
         verbose_name = "Slide"
-        verbose_name_plural = "Slidelar"
+        verbose_name_plural = "Sliderlar"
         ordering = ['order']
 
     def __str__(self):

@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'verbose_name': 'Slide',
-                'verbose_name_plural': 'Slidelar',
+                'verbose_name_plural': 'Sliderlar',
                 'ordering': ['order'],
             },
         ),
