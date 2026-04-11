@@ -7,8 +7,8 @@ class Region(models.Model):
     slug = models.SlugField(max_length=50, unique=True, verbose_name="Slug (ID)")
     name = models.CharField(max_length=100, verbose_name="Nomi")
     soato = models.CharField(max_length=10, blank=True, db_index=True, verbose_name="SOATO kodi")
+    name_uz = models.CharField(max_length=100, blank=True, verbose_name="Nomi (kirill)")
     name_ru = models.CharField(max_length=100, blank=True, verbose_name="Nomi (ruscha)")
-    name_en = models.CharField(max_length=100, blank=True, verbose_name="Nomi (inglizcha)")
     population = models.PositiveIntegerField(default=0, verbose_name="Aholi soni")
     center_lat = models.FloatField(default=0, verbose_name="Markaz (kenglik)")
     center_lng = models.FloatField(default=0, verbose_name="Markaz (uzunlik)")
@@ -30,8 +30,8 @@ class District(models.Model):
     slug = models.SlugField(max_length=50, unique=True, verbose_name="Slug (ID)")
     name = models.CharField(max_length=100, verbose_name="Nomi")
     soato = models.CharField(max_length=10, blank=True, db_index=True, verbose_name="SOATO kodi")
+    name_uz = models.CharField(max_length=100, blank=True, verbose_name="Nomi (kirill)")
     name_ru = models.CharField(max_length=100, blank=True, verbose_name="Nomi (ruscha)")
-    name_en = models.CharField(max_length=100, blank=True, verbose_name="Nomi (inglizcha)")
     population = models.PositiveIntegerField(default=0, verbose_name="Aholi soni")
 
     class Meta:
@@ -54,7 +54,6 @@ class Mahalla(models.Model):
     code = models.CharField(max_length=20, blank=True, verbose_name="Kod")
     name_uz = models.CharField(max_length=200, blank=True, verbose_name="Nomi (kirill)")
     name_ru = models.CharField(max_length=200, blank=True, verbose_name="Nomi (ruscha)")
-    name_en = models.CharField(max_length=200, blank=True, verbose_name="Nomi (inglizcha)")
     population = models.PositiveIntegerField(default=0, verbose_name="Aholi soni")
 
     class Meta:
@@ -108,8 +107,8 @@ class CulturalCenter(models.Model):
         Mahalla, blank=True, related_name='served_by_centers', verbose_name="Xizmat qiluvchi mahallalar"
     )
     name = models.CharField(max_length=255, verbose_name="Nomi")
+    name_uz = models.CharField(max_length=255, blank=True, verbose_name="Nomi (kirill)")
     name_ru = models.CharField(max_length=255, blank=True, verbose_name="Nomi (ruscha)")
-    name_en = models.CharField(max_length=255, blank=True, verbose_name="Nomi (inglizcha)")
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, verbose_name="Kategoriya")
     balance_holder = models.CharField(max_length=500, blank=True, verbose_name="Balansda saqlovchi")
     balance_holder_ru = models.CharField(max_length=500, blank=True, verbose_name="Balansda saqlovchi (ruscha)")
@@ -276,7 +275,7 @@ class AdminProfile(models.Model):
         "Asosiy ma'lumotlar": [
             ('name', "Nomi"),
             ('name_ru', "Nomi (ruscha)"),
-            ('name_en', "Nomi (inglizcha)"),
+            ('name_uz', "Nomi (kirill)"),
             ('category', "Kategoriya"),
             ('balance_holder', "Balansda saqlovchi"),
             ('balance_holder_ru', "Balansda saqlovchi (ruscha)"),

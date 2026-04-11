@@ -472,7 +472,7 @@ class CulturalCenterAdmin(admin.ModelAdmin):
     fieldsets = (
         ("Asosiy ma'lumotlar", {
             'fields': (
-                'name', 'name_ru', 'name_en',
+                'name', 'name_uz', 'name_ru',
                 'category', 'balance_holder', 'balance_holder_ru',
                 'region', 'district', 'mahalla', 'serving_mahallas',
                 'activity_types',

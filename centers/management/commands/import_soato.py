@@ -137,7 +137,6 @@ class Command(BaseCommand):
                     'code': m.get('code', ''),
                     'name_uz': m.get('name_uz', ''),
                     'name_ru': m.get('name_ru', ''),
-                    'name_en': m.get('name_en', ''),
                 }
             )
             mahalla_count += 1

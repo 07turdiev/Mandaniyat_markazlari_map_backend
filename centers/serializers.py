@@ -10,11 +10,11 @@ class TranslatedNameMixin:
         lang = get_current_language()
         if lang == 'uz':
             return obj.name
-        # uz-cyrl uchun name_uz maydonidan krill nomni olish
         if lang == 'uz-cyrl':
             return getattr(obj, 'name_uz', '') or obj.name
-        field = f'name_{lang}'
-        return getattr(obj, field, '') or obj.name
+        if lang == 'ru':
+            return getattr(obj, 'name_ru', '') or obj.name
+        return obj.name
 
 
 class MahallaSerializer(TranslatedNameMixin, serializers.ModelSerializer):
@@ -153,7 +153,9 @@ class CulturalCenterSerializer(TranslatedNameMixin, serializers.ModelSerializer)
             return obj.name
         if lang == 'uz-cyrl':
             return getattr(obj, 'name_uz', '') or obj.name
-        return getattr(obj, f'name_{lang}', '') or obj.name
+        if lang == 'ru':
+            return getattr(obj, 'name_ru', '') or obj.name
+        return obj.name
 
     def get_region_name(self, obj):
         lang = get_current_language()
@@ -251,7 +253,9 @@ class MapDataSerializer(TranslatedNameMixin, serializers.ModelSerializer):
             return obj.name
         if lang == 'uz-cyrl':
             return getattr(obj, 'name_uz', '') or obj.name
-        return getattr(obj, f'name_{lang}', '') or obj.name
+        if lang == 'ru':
+            return getattr(obj, 'name_ru', '') or obj.name
+        return obj.name
 
     def get_districts(self, obj):
         lang = get_current_language()

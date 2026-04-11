@@ -2,7 +2,7 @@ import threading
 
 _thread_local = threading.local()
 
-SUPPORTED_LANGUAGES = ('uz', 'uz-cyrl', 'ru', 'en')
+SUPPORTED_LANGUAGES = ('uz', 'uz-cyrl', 'ru')
 DEFAULT_LANGUAGE = 'uz'
 
 
