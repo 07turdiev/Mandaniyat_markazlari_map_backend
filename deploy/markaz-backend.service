@@ -1,13 +1,13 @@
 [Unit]
-Description=Markaz Backend (Gunicorn)
+Description=Markazlar Backend (Gunicorn)
 After=network.target
 
 [Service]
-User=user
-Group=user
-WorkingDirectory=/home/user/markaz-backend
+User=markaz
+Group=markaz
+WorkingDirectory=/home/markaz/markazlar_map/back
 Environment="DJANGO_SETTINGS_MODULE=config.settings_prod"
-ExecStart=/home/user/markaz-backend/venv/bin/gunicorn config.wsgi:application -c /home/user/markaz-backend/deploy/gunicorn.conf.py
+ExecStart=/home/markaz/markazlar_map/back/venv/bin/gunicorn config.wsgi:application -c /home/markaz/markazlar_map/back/deploy/gunicorn.conf.py
 Restart=always
 RestartSec=3
 
