@@ -143,7 +143,7 @@ class CulturalCenterSerializer(TranslatedNameMixin, serializers.ModelSerializer)
         fields = [
             'id', 'name', 'category', 'balance_holder', 'activity_types',
             'lat', 'lng', 'map_url',
-            'has_own_building', 'is_featured', 'images', 'projects',
+            'has_own_building', 'is_featured', 'is_dxsh_project', 'images', 'projects',
             # Obyekt haqida
             'circles_count', 'titled_teams_count', 'library_activity_count',
             # xadimlar
@@ -312,6 +312,7 @@ class MapDataSerializer(TranslatedNameMixin, serializers.ModelSerializer):
                     'name': c_name,
                     'category': c.category,
                     'is_featured': c.is_featured,
+                    'is_dxsh_project': c.is_dxsh_project,
                     'balance_holder': c.balance_holder_ru if (lang == 'ru' and c.balance_holder_ru) else c.balance_holder,
                     'has_own_building': c.has_own_building,
                     'activity_types': [at.name for at in c.activity_types.all()],

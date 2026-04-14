@@ -517,9 +517,9 @@ class CulturalCenterAdmin(admin.ModelAdmin):
     change_form_template = 'admin/centers/culturalcenter/change_form.html'
     list_display = [
         'name', 'category', 'get_region', 'district',
-        'condition', 'total_employees', 'is_featured',
+        'condition', 'total_employees', 'is_featured', 'is_dxsh_project',
     ]
-    list_filter = ['category', 'condition', 'district__region', 'activity_types', 'is_featured']
+    list_filter = ['category', 'condition', 'district__region', 'activity_types', 'is_featured', 'is_dxsh_project']
     search_fields = ['name', 'district__name', 'district__region__name']
     list_select_related = ['district', 'district__region', 'mahalla']
     inlines = [CulturalCenterImageInline, CulturalCenterProjectInline]
@@ -559,6 +559,9 @@ class CulturalCenterAdmin(admin.ModelAdmin):
         }),
         ('Kommunikatsiyalar', {
             'fields': ('has_heating', 'has_electricity', 'has_gas', 'has_water', 'has_sewerage'),
+        }),
+        ('DXSh loyiha', {
+            'fields': ('is_dxsh_project',),
         }),
         ('Ajratilgan markaz', {
             'fields': ('is_featured',),

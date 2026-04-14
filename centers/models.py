@@ -1,5 +1,7 @@
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Q
 
 
 class Region(models.Model):
@@ -158,6 +160,9 @@ class CulturalCenter(models.Model):
     # === Ajratilgan markaz ===
     is_featured = models.BooleanField(default=False, verbose_name="Ajratilgan markaz")
 
+    # === DXSh loyiha ===
+    is_dxsh_project = models.BooleanField(default=False, verbose_name="DXSh loyiha")
+
     # === Tizim ===
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan sana")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Yangilangan sana")
@@ -166,9 +171,23 @@ class CulturalCenter(models.Model):
         verbose_name = "Madaniyat markazi"
         verbose_name_plural = "Madaniyat markazlari"
         ordering = ['name']
+        constraints = [
+            models.CheckConstraint(
+                condition=~Q(is_featured=True, is_dxsh_project=True),
+                name='center_not_both_featured_and_dxsh',
+            ),
+        ]
 
     def __str__(self):
         return self.name
+
+    def clean(self):
+        super().clean()
+        if self.is_featured and self.is_dxsh_project:
+            raise ValidationError(
+                "Markaz bir vaqtning o'zida ham Pilot loyiha (Ajratilgan markaz), "
+                "ham DXSh loyiha bo'la olmaydi. Faqat bittasini tanlang."
+            )
 
     @property
     def region(self):
@@ -365,6 +384,9 @@ class AdminProfile(models.Model):
         ],
         "Ajratilgan markaz": [
             ('is_featured', "Ajratilgan markaz"),
+        ],
+        "DXSh loyiha": [
+            ('is_dxsh_project', "DXSh loyiha"),
         ],
     }
 
