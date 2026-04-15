@@ -6,6 +6,12 @@ SECRET_KEY = 'x9$k2m!f@3q7w#r5v8z&j1n4p6t0u2y-markazlar-prod-2026'
 
 ALLOWED_HOSTS = ['markaz.madaniyhayot.uz', 'markazlar.madaniyhayot.uz', 'localhost', '127.0.0.1']
 
+# Proxy (nginx) orqasida HTTPS ishlatilyapti — Django buni bilsin
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
 CSRF_TRUSTED_ORIGINS = ['https://markaz.madaniyhayot.uz', 'http://markaz.madaniyhayot.uz', 'https://markazlar.madaniyhayot.uz', 'http://markazlar.madaniyhayot.uz']
 
 CORS_ALLOWED_ORIGINS = [
