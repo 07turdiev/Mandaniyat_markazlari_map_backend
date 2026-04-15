@@ -327,6 +327,47 @@ class GuestHouseMedia(models.Model):
         return f"{self.guest_house.title} - {self.media_type} {self.order}"
 
 
+class ExemplaryCenter(models.Model):
+    """Namunali markaz taqdimoti — faqat bitta yozuv"""
+    title = models.CharField(max_length=255, verbose_name="Nomi (lotin)")
+    title_uz = models.CharField(max_length=255, blank=True, default='', verbose_name="Nomi (kirill)")
+    title_ru = models.CharField(max_length=255, blank=True, default='', verbose_name="Nomi (ruscha)")
+    is_active = models.BooleanField(default=True, verbose_name="Faol")
+
+    class Meta:
+        verbose_name = "Namunali markaz"
+        verbose_name_plural = "Namunali markaz"
+
+    def __str__(self):
+        return self.title
+
+
+class ExemplaryCenterMedia(models.Model):
+    """Namunali markaz rasmlari va videolari"""
+    MEDIA_CHOICES = [
+        ('image', 'Rasm'),
+        ('video', 'Video'),
+    ]
+    exemplary_center = models.ForeignKey(
+        ExemplaryCenter, on_delete=models.CASCADE, related_name='media', verbose_name="Namunali markaz"
+    )
+    media_type = models.CharField(max_length=10, choices=MEDIA_CHOICES, default='image', verbose_name="Turi")
+    image = models.ImageField(upload_to='exemplary/images/', blank=True, verbose_name="Rasm")
+    video = models.FileField(upload_to='exemplary/videos/', blank=True, verbose_name="Video")
+    caption = models.CharField(max_length=255, blank=True, verbose_name="Izoh (lotin)")
+    caption_uz = models.CharField(max_length=255, blank=True, default='', verbose_name="Izoh (kirill)")
+    caption_ru = models.CharField(max_length=255, blank=True, default='', verbose_name="Izoh (ruscha)")
+    order = models.PositiveIntegerField(default=0, verbose_name="Tartib")
+
+    class Meta:
+        verbose_name = "Namunali markaz media"
+        verbose_name_plural = "Namunali markaz media"
+        ordering = ['order']
+
+    def __str__(self):
+        return f"{self.exemplary_center.title} - {self.media_type} {self.order}"
+
+
 class AdminProfile(models.Model):
     """Admin foydalanuvchi profili — viloyat va maydon darajasida tahrirlash ruxsatlari"""
 

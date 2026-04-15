@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Region, District, Mahalla, CulturalCenter, CulturalCenterImage, CulturalCenterProject, ActivityType, Slide, SlideImage, GuestHouse, GuestHouseMedia
+from .models import Region, District, Mahalla, CulturalCenter, CulturalCenterImage, CulturalCenterProject, ActivityType, Slide, SlideImage, GuestHouse, GuestHouseMedia, ExemplaryCenter, ExemplaryCenterMedia
 from .middleware import get_current_language
 
 
@@ -98,6 +98,39 @@ class GuestHouseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = GuestHouse
+        fields = ['id', 'title', 'media']
+
+    def get_title(self, obj):
+        lang = get_current_language()
+        if lang == 'uz-cyrl' and obj.title_uz:
+            return obj.title_uz
+        if lang == 'ru' and obj.title_ru:
+            return obj.title_ru
+        return obj.title
+
+
+class ExemplaryCenterMediaSerializer(serializers.ModelSerializer):
+    caption = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ExemplaryCenterMedia
+        fields = ['id', 'media_type', 'image', 'video', 'caption', 'order']
+
+    def get_caption(self, obj):
+        lang = get_current_language()
+        if lang == 'uz-cyrl' and obj.caption_uz:
+            return obj.caption_uz
+        if lang == 'ru' and obj.caption_ru:
+            return obj.caption_ru
+        return obj.caption
+
+
+class ExemplaryCenterSerializer(serializers.ModelSerializer):
+    media = ExemplaryCenterMediaSerializer(many=True, read_only=True)
+    title = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ExemplaryCenter
         fields = ['id', 'title', 'media']
 
     def get_title(self, obj):

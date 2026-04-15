@@ -9,7 +9,7 @@ from django.utils.html import format_html
 from .models import (
     Region, District, Mahalla, CulturalCenter, CulturalCenterImage,
     CulturalCenterProject, ActivityType, AdminProfile, Slide, SlideImage,
-    GuestHouse, GuestHouseMedia,
+    GuestHouse, GuestHouseMedia, ExemplaryCenter, ExemplaryCenterMedia,
 )
 
 
@@ -413,6 +413,62 @@ class GuestHouseAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         # Faqat bitta yozuv bo'lishi mumkin
         if GuestHouse.objects.exists():
+            return False
+        return super().has_add_permission(request)
+
+
+class ExemplaryCenterMediaForm(forms.ModelForm):
+    class Meta:
+        model = ExemplaryCenterMedia
+        fields = '__all__'
+
+    def clean(self):
+        cleaned = super().clean()
+        media_type = cleaned.get('media_type')
+        image = cleaned.get('image')
+        video = cleaned.get('video')
+
+        if media_type == 'image' and not image:
+            self.add_error('image', 'Rasm turida rasm yuklash majburiy.')
+        if media_type == 'video' and not video:
+            self.add_error('video', 'Video turida video yuklash majburiy.')
+        return cleaned
+
+
+class ExemplaryCenterMediaInline(admin.TabularInline):
+    model = ExemplaryCenterMedia
+    form = ExemplaryCenterMediaForm
+    extra = 1
+    fields = ['media_type', 'image', 'video', 'caption', 'caption_uz', 'caption_ru', 'order']
+
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
+        if obj:
+            last_order = obj.media.order_by('-order').values_list('order', flat=True).first()
+            formset.form.base_fields['order'].initial = (last_order or 0) + 1
+        else:
+            formset.form.base_fields['order'].initial = 1
+        return formset
+
+
+@admin.register(ExemplaryCenter)
+class ExemplaryCenterAdmin(admin.ModelAdmin):
+    list_display = ['title', 'is_active', 'media_count']
+    fieldsets = [
+        ("O'zbekcha (lotin)", {'fields': ['title']}),
+        ("O'zbekcha (kirill)", {'fields': ['title_uz'], 'classes': ['collapse']}),
+        ("Ruscha", {'fields': ['title_ru'], 'classes': ['collapse']}),
+        ("Sozlamalar", {'fields': ['is_active']}),
+    ]
+    inlines = [ExemplaryCenterMediaInline]
+
+    @admin.display(description="Media soni")
+    def media_count(self, obj):
+        return obj.media.count()
+
+    def has_add_permission(self, request):
+        # Faqat bitta yozuv bo'lishi mumkin
+        if ExemplaryCenter.objects.exists():
             return False
         return super().has_add_permission(request)
 
