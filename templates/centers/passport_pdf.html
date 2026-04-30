@@ -62,23 +62,50 @@
             display: block;
         }
 
-        /* Ko'p rasm — vertikal galereya */
-        .gallery-multi {
+        /* Ko'p rasm — vertikal ustun (2-3 rasm) */
+        .gallery-column {
             width: 100%;
             height: 816px;
             overflow: hidden;
             padding: 8px;
         }
-        .gallery-multi-item {
+        .gallery-column-item {
             width: 100%;
             overflow: hidden;
             border-radius: 4px;
             margin-bottom: 6px;
         }
-        .gallery-multi-item:last-child {
+        .gallery-column-item:last-child {
             margin-bottom: 0;
         }
-        .gallery-multi-item img {
+        .gallery-column-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            border-radius: 4px;
+            border: 1.5px solid rgba(255,255,255,0.15);
+        }
+
+        /* Ko'p rasm — 2 ustunli grid (4+ rasm) */
+        .gallery-grid {
+            width: 100%;
+            height: 816px;
+            overflow: hidden;
+            padding: 8px;
+        }
+        .gallery-grid-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 6px;
+        }
+        .gallery-grid-table td {
+            width: 50%;
+            overflow: hidden;
+            border-radius: 4px;
+            padding: 0;
+        }
+        .gallery-grid-table td img {
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -317,17 +344,32 @@
 
         <!-- CHAP TOMON: GALEREYA -->
         <div class="passport-left">
-            {% if images|length == 1 %}
+            {% if gallery_mode == 'single' %}
             <div class="gallery-single">
                 <img src="{{ images.0 }}" alt="Markaz rasmi">
             </div>
-            {% elif images|length >= 2 %}
-            <div class="gallery-multi">
+            {% elif gallery_mode == 'column' %}
+            <div class="gallery-column">
                 {% for img in images %}
-                <div class="gallery-multi-item" style="height: {{ gallery_item_height }}px;">
+                <div class="gallery-column-item" style="height: {{ gallery_item_height }}px;">
                     <img src="{{ img }}" alt="Rasm {{ forloop.counter }}">
                 </div>
                 {% endfor %}
+            </div>
+            {% elif gallery_mode == 'grid' %}
+            <div class="gallery-grid">
+                <table class="gallery-grid-table">
+                    {% for row in gallery_rows %}
+                    <tr style="height: {{ gallery_item_height }}px;">
+                        {% for img in row %}
+                        <td><img src="{{ img }}" alt="Rasm"></td>
+                        {% endfor %}
+                        {% if row|length == 1 %}
+                        <td></td>
+                        {% endif %}
+                    </tr>
+                    {% endfor %}
+                </table>
             </div>
             {% else %}
             <div class="gallery-empty">

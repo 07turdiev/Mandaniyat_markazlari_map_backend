@@ -1,3 +1,4 @@
+import math
 from rest_framework import viewsets, status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -351,20 +352,39 @@ def passport_pdf(request, pk):
     }
     cond_info = conditions_info.get(center.condition, {'label': center.condition, 'class': ''})
 
-    # Galereya rasmlar balandligini hisoblash (816px ichida sig'ishi kerak)
-    # padding: 8px top + 8px bottom = 16px; gap: 6px * (n-1)
+    # Galereya rasmlar rejimi va balandligini hisoblash (816px ichida sig'ishi kerak)
     image_count = len(images)
-    if image_count >= 2:
-        available_height = 816 - 16  # padding
+    gallery_item_height = 816
+    gallery_mode = 'empty'  # empty, single, column, grid
+    gallery_rows = []  # grid rejimi uchun qatorlar
+
+    if image_count == 1:
+        gallery_mode = 'single'
+    elif 2 <= image_count <= 3:
+        # Vertikal ustun rejimi
+        gallery_mode = 'column'
+        # padding: 8px top + 8px bottom = 16px; gap: 6px * (n-1)
+        available_height = 816 - 16
         total_gaps = 6 * (image_count - 1)
         gallery_item_height = int((available_height - total_gaps) / image_count)
-    else:
-        gallery_item_height = 816
+    elif image_count >= 4:
+        # 2 ustunli grid rejimi
+        gallery_mode = 'grid'
+        num_rows = math.ceil(image_count / 2)
+        # padding: 8px, gap: 6px
+        available_height = 816 - 16
+        total_gaps = 6 * (num_rows - 1)
+        gallery_item_height = int((available_height - total_gaps) / num_rows)
+        # Rasmlarni qatorlarga bo'lish (har qatorda 2 tadan)
+        for i in range(0, image_count, 2):
+            gallery_rows.append(images[i:i+2])
 
     context = {
         'c': center,
         'images': images,
+        'gallery_mode': gallery_mode,
         'gallery_item_height': gallery_item_height,
+        'gallery_rows': gallery_rows,
         'category_label': cat_info['label'],
         'category_color': cat_info['color'],
         'condition_label': cond_info['label'],
