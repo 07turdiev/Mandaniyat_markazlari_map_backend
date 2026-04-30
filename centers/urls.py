@@ -13,6 +13,7 @@ urlpatterns = [
     path('map-data/', views.map_data, name='map-data'),
     path('statistics/', views.statistics, name='statistics'),
     path('slides/', views.slides_list, name='slides-list'),
+    path('centers/<int:pk>/passport-pdf/', views.passport_pdf, name='passport-pdf'),
     path('guesthouse/', views.guesthouse_detail, name='guesthouse-detail'),
     path('exemplary-center/', views.exemplary_center_detail, name='exemplary-center-detail'),
     # Admin AJAX endpointlari

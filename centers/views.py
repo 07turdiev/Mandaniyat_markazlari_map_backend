@@ -2,9 +2,12 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.db.models import Count
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
+from django.shortcuts import get_object_or_404
+from django.template.loader import render_to_string
 from django.contrib.admin.views.decorators import staff_member_required
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
+import weasyprint
 
 from .models import Region, District, Mahalla, CulturalCenter, Slide, GuestHouse, ExemplaryCenter
 from .serializers import (
@@ -307,3 +310,75 @@ def ajax_mahallas(request, district_id):
     """Admin panel uchun: tumanga tegishli mahallalar"""
     mahallas = Mahalla.objects.filter(district_id=district_id).order_by('name').values('id', 'name')
     return JsonResponse(list(mahallas), safe=False)
+
+
+@extend_schema(
+    summary="Madaniyat markazi pasportini PDF shaklida yuklab olish",
+    description="Markaz pasportini frontend dizayni kabi PDF generatsiya qiladi",
+    tags=['centers'],
+)
+@api_view(['GET'])
+def passport_pdf(request, pk):
+    """PDF pasport generatsiyasi"""
+    center = get_object_or_404(CulturalCenter.objects.select_related('district', 'district__region', 'mahalla'), pk=pk)
+
+    # 1. Rasmlarni tayyorlash
+    images = []
+    # O'z binosiga ega bo'lsa rasmlarni olamiz
+    if center.has_own_building is not False:
+        # Rasmlar
+        for img_obj in center.images.all().order_by('order'):
+            try:
+                images.append('file://' + img_obj.image.path)
+            except Exception:
+                pass
+                
+    # Kategoriya dizayni
+    categories_info = {
+        'vazirlik': {'label': 'Vazirlik tarkibida qoladi', 'color': '#2E7D32'},
+        'hokimlik': {'label': "Hokimlikka o'tkaziladi", 'color': '#1565C0'},
+        'dxsh': {'label': 'DXSH', 'color': '#73C3EB'},
+        'tugatiladi': {'label': 'Tugatiladi', 'color': '#C62828'},
+    }
+    cat_info = categories_info.get(center.category, {'label': center.category, 'color': '#999'})
+
+    # Holat dizayni
+    conditions_info = {
+        'Yaxshi': {'label': 'Yaxshi', 'class': 'cond-good'},
+        "O'rtacha": {'label': "O'rtacha", 'class': 'cond-mid'},
+        'Avariya holatida': {'label': 'Avariya holatida', 'class': 'cond-bad'},
+        'Tamir talab': {'label': 'Tamir talab', 'class': 'cond-repair'},
+    }
+    cond_info = conditions_info.get(center.condition, {'label': center.condition, 'class': ''})
+
+    # Galereya rasmlar balandligini hisoblash (816px ichida sig'ishi kerak)
+    # padding: 8px top + 8px bottom = 16px; gap: 6px * (n-1)
+    image_count = len(images)
+    if image_count >= 2:
+        available_height = 816 - 16  # padding
+        total_gaps = 6 * (image_count - 1)
+        gallery_item_height = int((available_height - total_gaps) / image_count)
+    else:
+        gallery_item_height = 816
+
+    context = {
+        'c': center,
+        'images': images,
+        'gallery_item_height': gallery_item_height,
+        'category_label': cat_info['label'],
+        'category_color': cat_info['color'],
+        'condition_label': cond_info['label'],
+        'condition_class': cond_info['class'],
+    }
+
+    # HTML shablonidan string yaratish
+    html_string = render_to_string('centers/passport_pdf.html', context, request=request)
+    
+    # WeasyPrint PDF qaytarish
+    html = weasyprint.HTML(string=html_string, base_url=request.build_absolute_uri('/'))
+    pdf = html.write_pdf()
+
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="passport_{center.id}.pdf"'
+    
+    return response

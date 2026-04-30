@@ -7,3 +7,4 @@ drf-spectacular==0.29.0
 gunicorn==23.0.0
 pillow==12.1.1
 sqlparse==0.5.5
+weasyprint==62.3
