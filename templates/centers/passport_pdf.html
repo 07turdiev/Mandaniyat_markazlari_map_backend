@@ -5,7 +5,7 @@
     <title>{{ c.name }} - Pasport</title>
     <style>
         @page {
-            size: 1056px 816px;
+            size: 11in 8.5in;
             margin: 0;
         }
         * {
@@ -337,7 +337,7 @@
             <div class="gallery-grid">
                 <table class="gallery-grid-table">
                     {% for row in gallery_rows %}
-                    <tr>
+                    <tr style="height: {{ gallery_item_height }}px;">
                         {% for img in row %}
                         <td class="gallery-grid-cell"><img src="{{ img }}" alt="Rasm"></td>
                         {% endfor %}

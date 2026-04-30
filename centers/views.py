@@ -352,11 +352,20 @@ def passport_pdf(request, pk):
     }
     cond_info = conditions_info.get(center.condition, {'label': center.condition, 'class': ''})
 
+    import math
     # Galereya: rasmlarni 2 ustunli jadvalga tayyorlash
     image_count = len(images)
     gallery_rows = []
+    gallery_item_height = 806 # Default for single
 
     if image_count >= 2:
+        num_rows = math.ceil(image_count / 2)
+        # padding: 5px top, 5px bottom -> 10px. 
+        # border-spacing: 4px -> 4px * (num_rows + 1)
+        available_height = 816 - 10
+        total_gaps = 4 * (num_rows + 1)
+        gallery_item_height = int((available_height - total_gaps) / num_rows)
+        
         # 2 ustunli grid — rasmlarni qatorlarga bo'lish
         for i in range(0, image_count, 2):
             gallery_rows.append(images[i:i+2])
@@ -365,6 +374,7 @@ def passport_pdf(request, pk):
         'c': center,
         'images': images,
         'gallery_rows': gallery_rows,
+        'gallery_item_height': gallery_item_height,
         'category_label': cat_info['label'],
         'category_color': cat_info['color'],
         'condition_label': cond_info['label'],
