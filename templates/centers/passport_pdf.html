@@ -13,7 +13,7 @@
             padding: 0;
             box-sizing: border-box;
         }
-        body {
+        html, body {
             font-family: Arial, Helvetica, sans-serif;
             margin: 0;
             padding: 0;
@@ -22,129 +22,115 @@
             font-size: 11px;
             width: 1056px;
             height: 816px;
+            max-height: 816px;
             overflow: hidden;
         }
 
-        /* ===== ASOSIY LAYOUT — table bilan ===== */
+        /* ===== ASOSIY LAYOUT ===== */
         .passport-wrapper {
-            display: table;
+            position: relative;
             width: 1056px;
             height: 816px;
-            table-layout: fixed;
+            max-height: 816px;
+            overflow: hidden;
         }
+
+        /* Rasmlar bo'lganda: 2 panel */
         .passport-left {
-            display: table-cell;
-            width: 40%;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 422px;
             height: 816px;
             background: #0F172A;
-            vertical-align: top;
             overflow: hidden;
         }
         .passport-right {
-            display: table-cell;
-            width: 60%;
+            position: absolute;
+            left: 422px;
+            top: 0;
+            width: 634px;
             height: 816px;
-            vertical-align: top;
+            overflow: hidden;
+        }
+
+        /* Rasmlar yo'q: to'liq kenglik */
+        .passport-right-full {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 1056px;
+            height: 816px;
             overflow: hidden;
         }
 
         /* ===== CHAP TOMON: GALEREYA ===== */
-        /* Bitta rasm — to'liq joy egallaydi */
+        /* Bitta rasm */
         .gallery-single {
-            width: 100%;
+            width: 422px;
             height: 816px;
             overflow: hidden;
         }
         .gallery-single img {
-            width: 100%;
+            width: 422px;
             height: 816px;
             object-fit: cover;
             display: block;
         }
 
-        /* Ko'p rasm — vertikal ustun (2-3 rasm) */
-        .gallery-column {
-            width: 100%;
-            height: 816px;
-            overflow: hidden;
-            padding: 8px;
-        }
-        .gallery-column-item {
-            width: 100%;
-            overflow: hidden;
-            border-radius: 4px;
-            margin-bottom: 6px;
-        }
-        .gallery-column-item:last-child {
-            margin-bottom: 0;
-        }
-        .gallery-column-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-            border-radius: 4px;
-            border: 1.5px solid rgba(255,255,255,0.15);
-        }
-
-        /* Ko'p rasm — 2 ustunli grid (4+ rasm) */
+        /* Ko'p rasm — table grid */
         .gallery-grid {
-            width: 100%;
+            width: 422px;
             height: 816px;
             overflow: hidden;
-            padding: 8px;
+            padding: 5px;
         }
         .gallery-grid-table {
             width: 100%;
+            height: 100%;
             border-collapse: separate;
-            border-spacing: 6px;
+            border-spacing: 4px;
         }
-        .gallery-grid-table td {
-            width: 50%;
+        .gallery-grid-cell {
             overflow: hidden;
             border-radius: 4px;
             padding: 0;
+            vertical-align: top;
         }
-        .gallery-grid-table td img {
+        .gallery-grid-cell img {
             width: 100%;
             height: 100%;
             object-fit: cover;
             display: block;
             border-radius: 4px;
-            border: 1.5px solid rgba(255,255,255,0.15);
         }
 
-        /* Rasmlar bo'lmaganda */
+        /* Rasmlar yo'q */
         .gallery-empty {
-            width: 100%;
+            width: 422px;
             height: 816px;
-            text-align: center;
-            vertical-align: middle;
+            overflow: hidden;
         }
-        .gallery-empty-inner {
-            display: table;
+        .gallery-empty-table {
             width: 100%;
-            height: 816px;
+            height: 100%;
         }
         .gallery-empty-cell {
-            display: table-cell;
-            vertical-align: middle;
             text-align: center;
+            vertical-align: middle;
         }
         .no-images-text {
             color: rgba(255,255,255,0.25);
-            font-size: 13px;
+            font-size: 14px;
             text-transform: uppercase;
             letter-spacing: 3px;
             font-weight: 600;
         }
 
         /* ===== O'NG TOMON: PASPORT ===== */
-
-        /* ===== HEADER ===== */
         .passport-header {
             padding: 12px 16px 10px;
-            background: #0F2557;
+            background: linear-gradient(135deg, #0F2557 0%, #1A3A7A 100%);
             color: white;
         }
         .passport-header-row {
@@ -157,7 +143,7 @@
             vertical-align: middle;
         }
         .gerb-cell {
-            width: 36px;
+            width: 32px;
             padding-right: 8px;
         }
         .passport-org {
@@ -175,7 +161,7 @@
             text-transform: uppercase;
         }
         .passport-name-row {
-            margin-bottom: 5px;
+            margin-bottom: 6px;
         }
         .passport-name-row h2 {
             font-size: 14px;
@@ -188,13 +174,13 @@
             color: white;
             font-size: 8px;
             font-weight: 700;
-            padding: 2px 7px;
+            padding: 2px 8px;
             border-radius: 8px;
             letter-spacing: 0.3px;
             white-space: nowrap;
             display: inline-block;
             vertical-align: middle;
-            margin-left: 6px;
+            margin-left: 8px;
         }
         .passport-meta {
             font-size: 9px;
@@ -203,18 +189,16 @@
 
         /* ===== BODY ===== */
         .passport-body {
-            padding: 10px 14px 14px;
+            padding: 10px 14px;
             background: #FAFBFD;
+            overflow: hidden;
         }
-        .passport-columns {
-            width: 100%;
-        }
-        .passport-columns > table {
+        .passport-columns-table {
             width: 100%;
             border-collapse: separate;
             border-spacing: 10px 0;
         }
-        .passport-columns > table > tbody > tr > td {
+        .passport-columns-table > tbody > tr > td {
             width: 50%;
             vertical-align: top;
         }
@@ -224,24 +208,24 @@
             width: 100%;
             border-collapse: collapse;
             background: white;
-            border-radius: 5px;
+            border-radius: 6px;
             overflow: hidden;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
             border: 1px solid #E8ECF1;
             margin-bottom: 8px;
         }
         .data-table-caption {
-            background: #1E3A6E;
+            background: linear-gradient(90deg, #1E3A6E 0%, #2A4F8F 100%);
             color: white;
             text-align: left;
-            padding: 5px 8px;
+            padding: 5px 10px;
             font-size: 8px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.8px;
         }
         .data-table td {
-            padding: 4px 8px;
+            padding: 4px 10px;
             font-size: 9px;
             border-bottom: 1px solid #F1F3F6;
             vertical-align: top;
@@ -252,7 +236,7 @@
         .dt-label {
             color: #64748B;
             font-weight: 500;
-            width: 48%;
+            width: 45%;
         }
         .dt-value {
             color: #1E293B;
@@ -272,10 +256,10 @@
         }
         .dot {
             display: inline-block;
-            width: 5px;
-            height: 5px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
-            margin-right: 2px;
+            margin-right: 3px;
             vertical-align: middle;
         }
         .val-yes { color: #16A34A; font-weight: 700; }
@@ -283,8 +267,8 @@
 
         .condition-badge {
             display: inline-block;
-            padding: 1px 5px;
-            border-radius: 4px;
+            padding: 1px 6px;
+            border-radius: 5px;
             font-size: 9px;
             font-weight: 700;
         }
@@ -297,33 +281,33 @@
             display: inline-block;
             font-size: 8px;
             font-weight: 500;
-            padding: 1px 5px;
-            border-radius: 5px;
+            padding: 1px 6px;
+            border-radius: 6px;
             background: #E0E7FF;
             color: #3730A3;
-            margin-right: 2px;
+            margin-right: 3px;
             margin-bottom: 1px;
         }
 
         .section-mahallas {
             background: white;
-            border-radius: 5px;
+            border-radius: 6px;
             overflow: hidden;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
             border: 1px solid #E8ECF1;
             margin-bottom: 8px;
         }
         .section-cap {
-            padding: 5px 8px;
+            padding: 5px 10px;
             font-size: 8px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.8px;
             color: white;
-            background: #1E3A6E;
+            background: linear-gradient(90deg, #1E3A6E 0%, #2A4F8F 100%);
         }
         .mahalla-chips {
-            padding: 6px 8px;
+            padding: 6px 10px;
         }
         .mahalla-chip {
             display: inline-block;
@@ -332,9 +316,9 @@
             padding: 2px 6px;
             background: #F1F5F9;
             border: 1px solid #E2E8F0;
-            border-radius: 3px;
+            border-radius: 4px;
             color: #334155;
-            margin-right: 2px;
+            margin-right: 3px;
             margin-bottom: 2px;
         }
     </style>
@@ -342,48 +326,34 @@
 <body>
     <div class="passport-wrapper">
 
+        {% if images %}
         <!-- CHAP TOMON: GALEREYA -->
         <div class="passport-left">
-            {% if gallery_mode == 'single' %}
+            {% if images|length == 1 %}
             <div class="gallery-single">
                 <img src="{{ images.0 }}" alt="Markaz rasmi">
             </div>
-            {% elif gallery_mode == 'column' %}
-            <div class="gallery-column">
-                {% for img in images %}
-                <div class="gallery-column-item" style="height: {{ gallery_item_height }}px;">
-                    <img src="{{ img }}" alt="Rasm {{ forloop.counter }}">
-                </div>
-                {% endfor %}
-            </div>
-            {% elif gallery_mode == 'grid' %}
+            {% else %}
             <div class="gallery-grid">
                 <table class="gallery-grid-table">
                     {% for row in gallery_rows %}
-                    <tr style="height: {{ gallery_item_height }}px;">
+                    <tr>
                         {% for img in row %}
-                        <td><img src="{{ img }}" alt="Rasm"></td>
+                        <td class="gallery-grid-cell"><img src="{{ img }}" alt="Rasm"></td>
                         {% endfor %}
                         {% if row|length == 1 %}
-                        <td></td>
+                        <td class="gallery-grid-cell"></td>
                         {% endif %}
                     </tr>
                     {% endfor %}
                 </table>
             </div>
-            {% else %}
-            <div class="gallery-empty">
-                <div class="gallery-empty-inner">
-                    <div class="gallery-empty-cell">
-                        <div class="no-images-text">Rasm mavjud emas</div>
-                    </div>
-                </div>
-            </div>
             {% endif %}
         </div>
+        {% endif %}
 
         <!-- O'NG TOMON: PASPORT -->
-        <div class="passport-right">
+        <div class="{% if images %}passport-right{% else %}passport-right-full{% endif %}">
             <!-- Header -->
             <div class="passport-header">
                 <div class="passport-header-row">
@@ -410,99 +380,97 @@
 
             <!-- Body -->
             <div class="passport-body">
-                <div class="passport-columns">
-                    <table><tbody><tr>
+                <table class="passport-columns-table"><tbody><tr>
 
-                    <!-- CHAP USTUN -->
-                    <td>
-                        <!-- Umumiy ma'lumot -->
-                        <table class="data-table">
-                            <thead><tr><th colspan="2" class="data-table-caption">Umumiy ma'lumot</th></tr></thead>
-                            <tbody>
-                                {% if c.balance_holder %}
-                                <tr><td class="dt-label">Balans egasi</td><td class="dt-value">{{ c.balance_holder }}</td></tr>
-                                {% endif %}
-                                <tr>
-                                    <td class="dt-label">O'z binosi</td>
-                                    <td class="dt-value">{% if c.has_own_building %}<span class="val-yes">Ha</span>{% else %}<span class="val-no">Yo'q</span>{% endif %}</td>
-                                </tr>
-                                {% if c.activity_types.all %}
-                                <tr><td class="dt-label">Faoliyat turi</td><td class="dt-value">{% for item in c.activity_types.all %}<span class="tag">{{ item.name }}</span>{% endfor %}</td></tr>
-                                {% endif %}
-                                {% if c.mahalla %}
-                                <tr><td class="dt-label">Mahalla</td><td class="dt-value">{{ c.mahalla.name }}{% if c.mahalla.population %} <small>({{ c.mahalla.population }} nafar)</small>{% endif %}</td></tr>
-                                {% endif %}
-                            </tbody>
-                        </table>
+                <!-- CHAP USTUN -->
+                <td>
+                    <!-- Umumiy ma'lumot -->
+                    <table class="data-table">
+                        <thead><tr><th colspan="2" class="data-table-caption">Umumiy ma'lumot</th></tr></thead>
+                        <tbody>
+                            {% if c.balance_holder %}
+                            <tr><td class="dt-label">Balans egasi</td><td class="dt-value">{{ c.balance_holder }}</td></tr>
+                            {% endif %}
+                            <tr>
+                                <td class="dt-label">O'z binosi</td>
+                                <td class="dt-value">{% if c.has_own_building %}<span class="val-yes">Ha</span>{% else %}<span class="val-no">Yo'q</span>{% endif %}</td>
+                            </tr>
+                            {% if c.activity_types.all %}
+                            <tr><td class="dt-label">Faoliyat turi</td><td class="dt-value">{% for item in c.activity_types.all %}<span class="tag">{{ item.name }}</span>{% endfor %}</td></tr>
+                            {% endif %}
+                            {% if c.mahalla %}
+                            <tr><td class="dt-label">Mahalla</td><td class="dt-value">{{ c.mahalla.name }}{% if c.mahalla.population %} <small>({{ c.mahalla.population }} nafar)</small>{% endif %}</td></tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
 
-                        {% if c.circles_count or c.titled_teams_count or c.library_activity_count %}
-                        <table class="data-table">
-                            <thead><tr><th colspan="2" class="data-table-caption">Faoliyat ko'rsatkichlari</th></tr></thead>
-                            <tbody>
-                                {% if c.circles_count != None %}<tr><td class="dt-label">To'garaklar soni</td><td class="dt-value dt-num">{{ c.circles_count }}</td></tr>{% endif %}
-                                {% if c.titled_teams_count != None %}<tr><td class="dt-label">Unvonga ega jamoalar</td><td class="dt-value dt-num">{{ c.titled_teams_count }}</td></tr>{% endif %}
-                                {% if c.library_activity_count != None %}<tr><td class="dt-label">Kutubxona faoliyati</td><td class="dt-value dt-num">{{ c.library_activity_count }}</td></tr>{% endif %}
-                            </tbody>
-                        </table>
-                        {% endif %}
+                    {% if c.circles_count or c.titled_teams_count or c.library_activity_count %}
+                    <table class="data-table">
+                        <thead><tr><th colspan="2" class="data-table-caption">Faoliyat ko'rsatkichlari</th></tr></thead>
+                        <tbody>
+                            {% if c.circles_count != None %}<tr><td class="dt-label">To'garaklar soni</td><td class="dt-value dt-num">{{ c.circles_count }}</td></tr>{% endif %}
+                            {% if c.titled_teams_count != None %}<tr><td class="dt-label">Unvonga ega jamoalar</td><td class="dt-value dt-num">{{ c.titled_teams_count }}</td></tr>{% endif %}
+                            {% if c.library_activity_count != None %}<tr><td class="dt-label">Kutubxona faoliyati</td><td class="dt-value dt-num">{{ c.library_activity_count }}</td></tr>{% endif %}
+                        </tbody>
+                    </table>
+                    {% endif %}
 
-                        {% if c.total_employees %}
-                        <table class="data-table">
-                            <thead><tr><th colspan="2" class="data-table-caption">Xodimlar tarkibi</th></tr></thead>
-                            <tbody>
-                                <tr class="row-total"><td class="dt-label">Jami xodimlar</td><td class="dt-value dt-num dt-bold">{{ c.total_employees }}</td></tr>
-                                {% if c.management_staff %}<tr><td class="dt-label"><span class="dot" style="background:#3B82F6"></span> Boshqaruv</td><td class="dt-value dt-num">{{ c.management_staff }}</td></tr>{% endif %}
-                                {% if c.creative_staff %}<tr><td class="dt-label"><span class="dot" style="background:#8B5CF6"></span> Ijodiy</td><td class="dt-value dt-num">{{ c.creative_staff }}</td></tr>{% endif %}
-                                {% if c.technical_staff %}<tr><td class="dt-label"><span class="dot" style="background:#F59E0B"></span> Texnik</td><td class="dt-value dt-num">{{ c.technical_staff }}</td></tr>{% endif %}
-                                {% if c.titled_team_staff %}<tr><td class="dt-label"><span class="dot" style="background:#10B981"></span> Unvonga ega jamoalar</td><td class="dt-value dt-num">{{ c.titled_team_staff }}</td></tr>{% endif %}
-                            </tbody>
-                        </table>
-                        {% endif %}
+                    {% if c.total_employees %}
+                    <table class="data-table">
+                        <thead><tr><th colspan="2" class="data-table-caption">Xodimlar tarkibi</th></tr></thead>
+                        <tbody>
+                            <tr class="row-total"><td class="dt-label">Jami xodimlar</td><td class="dt-value dt-num dt-bold">{{ c.total_employees }}</td></tr>
+                            {% if c.management_staff %}<tr><td class="dt-label"><span class="dot" style="background:#3B82F6"></span> Boshqaruv</td><td class="dt-value dt-num">{{ c.management_staff }}</td></tr>{% endif %}
+                            {% if c.creative_staff %}<tr><td class="dt-label"><span class="dot" style="background:#8B5CF6"></span> Ijodiy</td><td class="dt-value dt-num">{{ c.creative_staff }}</td></tr>{% endif %}
+                            {% if c.technical_staff %}<tr><td class="dt-label"><span class="dot" style="background:#F59E0B"></span> Texnik</td><td class="dt-value dt-num">{{ c.technical_staff }}</td></tr>{% endif %}
+                            {% if c.titled_team_staff %}<tr><td class="dt-label"><span class="dot" style="background:#10B981"></span> Unvonga ega jamoalar</td><td class="dt-value dt-num">{{ c.titled_team_staff }}</td></tr>{% endif %}
+                        </tbody>
+                    </table>
+                    {% endif %}
 
-                        {% if c.serving_mahallas.all %}
-                        <div class="section-mahallas">
-                            <div class="section-cap">Xizmat ko'rsatiladigan mahallalar</div>
-                            <div class="mahalla-chips">{% for sm in c.serving_mahallas.all %}<span class="mahalla-chip">{{ sm.name }}</span>{% endfor %}</div>
-                        </div>
-                        {% endif %}
-                    </td>
+                    {% if c.serving_mahallas.all %}
+                    <div class="section-mahallas">
+                        <div class="section-cap">Xizmat ko'rsatiladigan mahallalar</div>
+                        <div class="mahalla-chips">{% for sm in c.serving_mahallas.all %}<span class="mahalla-chip">{{ sm.name }}</span>{% endfor %}</div>
+                    </div>
+                    {% endif %}
+                </td>
 
-                    <!-- O'NG USTUN -->
-                    <td>
-                        {% if c.has_own_building %}
-                        <table class="data-table">
-                            <thead><tr><th colspan="2" class="data-table-caption">Bino va inshoot</th></tr></thead>
-                            <tbody>
-                                {% if c.condition %}<tr><td class="dt-label">Bino holati</td><td class="dt-value"><span class="condition-badge {{ condition_class }}">{{ condition_label }}</span></td></tr>{% endif %}
-                                {% if c.built_year %}<tr><td class="dt-label">Qurilgan yili</td><td class="dt-value dt-num">{{ c.built_year }}</td></tr>{% endif %}
-                                {% if c.building_area %}<tr><td class="dt-label">Bino maydoni</td><td class="dt-value dt-num">{{ c.building_area }} m²</td></tr>{% endif %}
-                                {% if c.total_land_area %}<tr><td class="dt-label">Yer maydoni</td><td class="dt-value dt-num">{{ c.total_land_area }} ga</td></tr>{% endif %}
-                                {% if c.buildings_count %}<tr><td class="dt-label">Binolar soni</td><td class="dt-value dt-num">{{ c.buildings_count }}</td></tr>{% endif %}
-                                {% if c.building_floors %}<tr><td class="dt-label">Qavatlar soni</td><td class="dt-value dt-num">{{ c.building_floors }}</td></tr>{% endif %}
-                                {% if c.rooms_count %}<tr><td class="dt-label">Xonalar soni</td><td class="dt-value dt-num">{{ c.rooms_count }}</td></tr>{% endif %}
-                                {% if c.auditorium_seats %}<tr><td class="dt-label">Tomoshabinlar zali(o'rin)</td><td class="dt-value dt-num">{{ c.auditorium_seats }}</td></tr>{% endif %}
-                                {% if c.dining_area %}<tr><td class="dt-label">Oshxona maydoni</td><td class="dt-value dt-num">{{ c.dining_area }} m²</td></tr>{% endif %}
-                                {% if c.restrooms_count %}<tr><td class="dt-label">Hojatxonalar</td><td class="dt-value dt-num">{{ c.restrooms_count }}</td></tr>{% endif %}
-                                {% if c.additional_buildings_count %}<tr><td class="dt-label">Qo'shimcha binolar</td><td class="dt-value dt-num">{{ c.additional_buildings_count }}</td></tr>{% endif %}
-                                {% if c.building_technical_info %}<tr><td class="dt-label">Texnik ma'lumot</td><td class="dt-value">{{ c.building_technical_info }}</td></tr>{% endif %}
-                            </tbody>
-                        </table>
+                <!-- O'NG USTUN -->
+                <td>
+                    {% if c.has_own_building %}
+                    <table class="data-table">
+                        <thead><tr><th colspan="2" class="data-table-caption">Bino va inshoot</th></tr></thead>
+                        <tbody>
+                            {% if c.condition %}<tr><td class="dt-label">Bino holati</td><td class="dt-value"><span class="condition-badge {{ condition_class }}">{{ condition_label }}</span></td></tr>{% endif %}
+                            {% if c.built_year %}<tr><td class="dt-label">Qurilgan yili</td><td class="dt-value dt-num">{{ c.built_year }}</td></tr>{% endif %}
+                            {% if c.building_area %}<tr><td class="dt-label">Bino maydoni</td><td class="dt-value dt-num">{{ c.building_area }} m²</td></tr>{% endif %}
+                            {% if c.total_land_area %}<tr><td class="dt-label">Yer maydoni</td><td class="dt-value dt-num">{{ c.total_land_area }} ga</td></tr>{% endif %}
+                            {% if c.buildings_count %}<tr><td class="dt-label">Binolar soni</td><td class="dt-value dt-num">{{ c.buildings_count }}</td></tr>{% endif %}
+                            {% if c.building_floors %}<tr><td class="dt-label">Qavatlar soni</td><td class="dt-value dt-num">{{ c.building_floors }}</td></tr>{% endif %}
+                            {% if c.rooms_count %}<tr><td class="dt-label">Xonalar soni</td><td class="dt-value dt-num">{{ c.rooms_count }}</td></tr>{% endif %}
+                            {% if c.auditorium_seats %}<tr><td class="dt-label">Tomoshabinlar zali(o'rin)</td><td class="dt-value dt-num">{{ c.auditorium_seats }}</td></tr>{% endif %}
+                            {% if c.dining_area %}<tr><td class="dt-label">Oshxona maydoni</td><td class="dt-value dt-num">{{ c.dining_area }} m²</td></tr>{% endif %}
+                            {% if c.restrooms_count %}<tr><td class="dt-label">Hojatxonalar</td><td class="dt-value dt-num">{{ c.restrooms_count }}</td></tr>{% endif %}
+                            {% if c.additional_buildings_count %}<tr><td class="dt-label">Qo'shimcha binolar</td><td class="dt-value dt-num">{{ c.additional_buildings_count }}</td></tr>{% endif %}
+                            {% if c.building_technical_info %}<tr><td class="dt-label">Texnik ma'lumot</td><td class="dt-value">{{ c.building_technical_info }}</td></tr>{% endif %}
+                        </tbody>
+                    </table>
 
-                        <table class="data-table">
-                            <thead><tr><th colspan="2" class="data-table-caption">Kommunal ta'minot</th></tr></thead>
-                            <tbody>
-                                <tr><td class="dt-label">Isitish tizimi</td><td class="dt-value">{% if c.has_heating %}<span class="val-yes">Bor</span>{% else %}<span class="val-no">Yo'q</span>{% endif %}</td></tr>
-                                <tr><td class="dt-label">Elektr ta'minoti</td><td class="dt-value">{% if c.has_electricity %}<span class="val-yes">Bor</span>{% else %}<span class="val-no">Yo'q</span>{% endif %}</td></tr>
-                                <tr><td class="dt-label">Gaz ta'minoti</td><td class="dt-value">{% if c.has_gas %}<span class="val-yes">Bor</span>{% else %}<span class="val-no">Yo'q</span>{% endif %}</td></tr>
-                                <tr><td class="dt-label">Suv ta'minoti</td><td class="dt-value">{% if c.has_water %}<span class="val-yes">Bor</span>{% else %}<span class="val-no">Yo'q</span>{% endif %}</td></tr>
-                                <tr><td class="dt-label">Kanalizatsiya</td><td class="dt-value">{% if c.has_sewerage %}<span class="val-yes">Bor</span>{% else %}<span class="val-no">Yo'q</span>{% endif %}</td></tr>
-                            </tbody>
-                        </table>
-                        {% endif %}
-                    </td>
+                    <table class="data-table">
+                        <thead><tr><th colspan="2" class="data-table-caption">Kommunal ta'minot</th></tr></thead>
+                        <tbody>
+                            <tr><td class="dt-label">Isitish tizimi</td><td class="dt-value">{% if c.has_heating %}<span class="val-yes">Bor</span>{% else %}<span class="val-no">Yo'q</span>{% endif %}</td></tr>
+                            <tr><td class="dt-label">Elektr ta'minoti</td><td class="dt-value">{% if c.has_electricity %}<span class="val-yes">Bor</span>{% else %}<span class="val-no">Yo'q</span>{% endif %}</td></tr>
+                            <tr><td class="dt-label">Gaz ta'minoti</td><td class="dt-value">{% if c.has_gas %}<span class="val-yes">Bor</span>{% else %}<span class="val-no">Yo'q</span>{% endif %}</td></tr>
+                            <tr><td class="dt-label">Suv ta'minoti</td><td class="dt-value">{% if c.has_water %}<span class="val-yes">Bor</span>{% else %}<span class="val-no">Yo'q</span>{% endif %}</td></tr>
+                            <tr><td class="dt-label">Kanalizatsiya</td><td class="dt-value">{% if c.has_sewerage %}<span class="val-yes">Bor</span>{% else %}<span class="val-no">Yo'q</span>{% endif %}</td></tr>
+                        </tbody>
+                    </table>
+                    {% endif %}
+                </td>
 
-                    </tr></tbody></table>
-                </div>
+                </tr></tbody></table>
             </div>
         </div>
 

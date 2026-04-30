@@ -352,38 +352,18 @@ def passport_pdf(request, pk):
     }
     cond_info = conditions_info.get(center.condition, {'label': center.condition, 'class': ''})
 
-    # Galereya rasmlar rejimi va balandligini hisoblash (816px ichida sig'ishi kerak)
+    # Galereya: rasmlarni 2 ustunli jadvalga tayyorlash
     image_count = len(images)
-    gallery_item_height = 816
-    gallery_mode = 'empty'  # empty, single, column, grid
-    gallery_rows = []  # grid rejimi uchun qatorlar
+    gallery_rows = []
 
-    if image_count == 1:
-        gallery_mode = 'single'
-    elif 2 <= image_count <= 3:
-        # Vertikal ustun rejimi
-        gallery_mode = 'column'
-        # padding: 8px top + 8px bottom = 16px; gap: 6px * (n-1)
-        available_height = 816 - 16
-        total_gaps = 6 * (image_count - 1)
-        gallery_item_height = int((available_height - total_gaps) / image_count)
-    elif image_count >= 4:
-        # 2 ustunli grid rejimi
-        gallery_mode = 'grid'
-        num_rows = math.ceil(image_count / 2)
-        # padding: 8px, gap: 6px
-        available_height = 816 - 16
-        total_gaps = 6 * (num_rows - 1)
-        gallery_item_height = int((available_height - total_gaps) / num_rows)
-        # Rasmlarni qatorlarga bo'lish (har qatorda 2 tadan)
+    if image_count >= 2:
+        # 2 ustunli grid — rasmlarni qatorlarga bo'lish
         for i in range(0, image_count, 2):
             gallery_rows.append(images[i:i+2])
 
     context = {
         'c': center,
         'images': images,
-        'gallery_mode': gallery_mode,
-        'gallery_item_height': gallery_item_height,
         'gallery_rows': gallery_rows,
         'category_label': cat_info['label'],
         'category_color': cat_info['color'],
