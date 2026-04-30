@@ -5,7 +5,7 @@
     <title>{{ c.name }} - Pasport</title>
     <style>
         @page {
-            size: 11in 8.5in;
+            size: 1500px 800px;
             margin: 0;
         }
         * {
@@ -19,122 +19,76 @@
             padding: 0;
             color: #1E293B;
             background: #fff;
-            font-size: 11px;
-            width: 1056px;
-            height: 816px;
-            max-height: 816px;
+            font-size: 12px;
+            width: 1500px;
+            height: 800px;
+            max-height: 800px;
             overflow: hidden;
         }
 
         /* ===== ASOSIY LAYOUT ===== */
         .passport-wrapper {
             position: relative;
-            width: 1056px;
-            height: 816px;
-            max-height: 816px;
+            width: 1500px;
+            height: 800px;
+            max-height: 800px;
             overflow: hidden;
         }
 
-        /* Rasmlar bo'lganda: 2 panel */
+        /* Rasm bo'lganda: 2 panel */
         .passport-left {
             position: absolute;
             left: 0;
             top: 0;
-            width: 422px;
-            height: 816px;
+            width: 660px;
+            height: 800px;
             background: #0F172A;
             overflow: hidden;
         }
         .passport-right {
             position: absolute;
-            left: 422px;
+            left: 660px;
             top: 0;
-            width: 634px;
-            height: 816px;
+            width: 840px;
+            height: 800px;
             overflow: hidden;
+            background: #FAFBFD;
         }
 
-        /* Rasmlar yo'q: to'liq kenglik */
+        /* Rasm yo'q: to'liq kenglik */
         .passport-right-full {
             position: absolute;
             left: 0;
             top: 0;
-            width: 1056px;
-            height: 816px;
+            width: 1500px;
+            height: 800px;
             overflow: hidden;
+            background: #FAFBFD;
         }
 
-        /* ===== CHAP TOMON: GALEREYA ===== */
-        /* Bitta rasm */
+        /* ===== CHAP TOMON: BITTA RASM ===== */
         .gallery-single {
-            width: 422px;
-            height: 816px;
+            width: 660px;
+            height: 800px;
             overflow: hidden;
+            display: block;
         }
         .gallery-single img {
-            width: 422px;
-            height: 816px;
+            width: 660px;
+            height: 800px;
             object-fit: cover;
+            object-position: center;
             display: block;
-        }
-
-        /* Ko'p rasm — table grid */
-        .gallery-grid {
-            width: 422px;
-            height: 816px;
-            overflow: hidden;
-            padding: 5px;
-        }
-        .gallery-grid-table {
-            width: 100%;
-            height: 100%;
-            border-collapse: separate;
-            border-spacing: 4px;
-        }
-        .gallery-grid-cell {
-            overflow: hidden;
-            border-radius: 4px;
-            padding: 0;
-            vertical-align: top;
-        }
-        .gallery-grid-cell img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-            border-radius: 4px;
-        }
-
-        /* Rasmlar yo'q */
-        .gallery-empty {
-            width: 422px;
-            height: 816px;
-            overflow: hidden;
-        }
-        .gallery-empty-table {
-            width: 100%;
-            height: 100%;
-        }
-        .gallery-empty-cell {
-            text-align: center;
-            vertical-align: middle;
-        }
-        .no-images-text {
-            color: rgba(255,255,255,0.25);
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            font-weight: 600;
         }
 
         /* ===== O'NG TOMON: PASPORT ===== */
         .passport-header {
-            padding: 12px 16px 10px;
+            padding: 16px 20px 14px;
             background: linear-gradient(135deg, #0F2557 0%, #1A3A7A 100%);
             color: white;
         }
         .passport-header-row {
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
         .passport-header-row table {
             width: 100%;
@@ -143,28 +97,28 @@
             vertical-align: middle;
         }
         .gerb-cell {
-            width: 32px;
-            padding-right: 8px;
+            width: 40px;
+            padding-right: 10px;
         }
         .passport-org {
-            font-size: 8px;
+            font-size: 10px;
             font-weight: 500;
             text-transform: uppercase;
             letter-spacing: 1px;
             opacity: 0.7;
-            margin-bottom: 1px;
+            margin-bottom: 2px;
         }
         .passport-doc-title {
-            font-size: 11px;
+            font-size: 13px;
             font-weight: 800;
             letter-spacing: 1.5px;
             text-transform: uppercase;
         }
         .passport-name-row {
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
         .passport-name-row h2 {
-            font-size: 14px;
+            font-size: 18px;
             font-weight: 700;
             line-height: 1.3;
             margin: 0;
@@ -172,31 +126,31 @@
         }
         .passport-badge {
             color: white;
-            font-size: 8px;
+            font-size: 10px;
             font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 8px;
+            padding: 3px 10px;
+            border-radius: 10px;
             letter-spacing: 0.3px;
             white-space: nowrap;
             display: inline-block;
             vertical-align: middle;
-            margin-left: 8px;
+            margin-left: 10px;
         }
         .passport-meta {
-            font-size: 9px;
+            font-size: 11px;
             opacity: 0.7;
         }
 
         /* ===== BODY ===== */
         .passport-body {
-            padding: 10px 14px;
+            padding: 16px 20px;
             background: #FAFBFD;
             overflow: hidden;
         }
         .passport-columns-table {
             width: 100%;
             border-collapse: separate;
-            border-spacing: 10px 0;
+            border-spacing: 16px 0;
         }
         .passport-columns-table > tbody > tr > td {
             width: 50%;
@@ -208,25 +162,25 @@
             width: 100%;
             border-collapse: collapse;
             background: white;
-            border-radius: 6px;
+            border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 1px 3px rgba(0,0,0,0.06);
             border: 1px solid #E8ECF1;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
         .data-table-caption {
             background: linear-gradient(90deg, #1E3A6E 0%, #2A4F8F 100%);
             color: white;
             text-align: left;
-            padding: 5px 10px;
-            font-size: 8px;
+            padding: 8px 12px;
+            font-size: 10px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.8px;
         }
         .data-table td {
-            padding: 4px 10px;
-            font-size: 9px;
+            padding: 6px 12px;
+            font-size: 11px;
             border-bottom: 1px solid #F1F3F6;
             vertical-align: top;
         }
@@ -246,7 +200,7 @@
             text-align: right;
         }
         .dt-bold {
-            font-size: 12px;
+            font-size: 14px;
             font-weight: 800;
             color: #0F172A;
         }
@@ -256,10 +210,10 @@
         }
         .dot {
             display: inline-block;
-            width: 6px;
-            height: 6px;
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
-            margin-right: 3px;
+            margin-right: 4px;
             vertical-align: middle;
         }
         .val-yes { color: #16A34A; font-weight: 700; }
@@ -267,9 +221,9 @@
 
         .condition-badge {
             display: inline-block;
-            padding: 1px 6px;
-            border-radius: 5px;
-            font-size: 9px;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 10px;
             font-weight: 700;
         }
         .cond-good { background: #DCFCE7; color: #15803D; }
@@ -279,27 +233,27 @@
 
         .tag {
             display: inline-block;
-            font-size: 8px;
+            font-size: 10px;
             font-weight: 500;
-            padding: 1px 6px;
-            border-radius: 6px;
+            padding: 2px 8px;
+            border-radius: 8px;
             background: #E0E7FF;
             color: #3730A3;
-            margin-right: 3px;
-            margin-bottom: 1px;
+            margin-right: 4px;
+            margin-bottom: 2px;
         }
 
         .section-mahallas {
             background: white;
-            border-radius: 6px;
+            border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 1px 3px rgba(0,0,0,0.06);
             border: 1px solid #E8ECF1;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
         .section-cap {
-            padding: 5px 10px;
-            font-size: 8px;
+            padding: 8px 12px;
+            font-size: 10px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.8px;
@@ -307,59 +261,42 @@
             background: linear-gradient(90deg, #1E3A6E 0%, #2A4F8F 100%);
         }
         .mahalla-chips {
-            padding: 6px 10px;
+            padding: 10px 12px;
         }
         .mahalla-chip {
             display: inline-block;
-            font-size: 8px;
+            font-size: 10px;
             font-weight: 500;
-            padding: 2px 6px;
+            padding: 3px 10px;
             background: #F1F5F9;
             border: 1px solid #E2E8F0;
-            border-radius: 4px;
+            border-radius: 6px;
             color: #334155;
-            margin-right: 3px;
-            margin-bottom: 2px;
+            margin-right: 4px;
+            margin-bottom: 3px;
         }
     </style>
 </head>
 <body>
     <div class="passport-wrapper">
 
-        {% if images %}
-        <!-- CHAP TOMON: GALEREYA -->
+        {% if image %}
+        <!-- CHAP TOMON: BITTA RASM -->
         <div class="passport-left">
-            {% if images|length == 1 %}
             <div class="gallery-single">
-                <img src="{{ images.0 }}" alt="Markaz rasmi">
+                <img src="{{ image }}" alt="Markaz rasmi">
             </div>
-            {% else %}
-            <div class="gallery-grid">
-                <table class="gallery-grid-table">
-                    {% for row in gallery_rows %}
-                    <tr style="height: {{ gallery_item_height }}px;">
-                        {% for img in row %}
-                        <td class="gallery-grid-cell"><img src="{{ img }}" alt="Rasm"></td>
-                        {% endfor %}
-                        {% if row|length == 1 %}
-                        <td class="gallery-grid-cell"></td>
-                        {% endif %}
-                    </tr>
-                    {% endfor %}
-                </table>
-            </div>
-            {% endif %}
         </div>
         {% endif %}
 
         <!-- O'NG TOMON: PASPORT -->
-        <div class="{% if images %}passport-right{% else %}passport-right-full{% endif %}">
+        <div class="{% if image %}passport-right{% else %}passport-right-full{% endif %}">
             <!-- Header -->
             <div class="passport-header">
                 <div class="passport-header-row">
                     <table><tr>
                         <td class="gerb-cell">
-                            <svg viewBox="0 0 24 24" width="26" height="26">
+                            <svg viewBox="0 0 24 24" width="32" height="32">
                                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="rgba(255,255,255,0.6)" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
                             </svg>
                         </td>
