@@ -81,6 +81,78 @@
             display: block;
         }
 
+        /* ===== CHAP TOMON: 2x2 GRID (4 ta rasm) ===== */
+        .gallery-grid {
+            width: 660px;
+            height: 800px;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+        .gallery-grid td {
+            width: 330px;
+            height: 400px;
+            padding: 0;
+            margin: 0;
+            overflow: hidden;
+            background: #0F172A;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .gallery-grid img {
+            width: 330px;
+            height: 400px;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+        }
+
+        /* 1, 2 yoki 3 ta rasm bo'lganda — markazga joylashtirish */
+        .gallery-multi {
+            width: 660px;
+            height: 800px;
+            display: block;
+        }
+        .gallery-multi-row {
+            width: 660px;
+            height: 400px;
+            display: block;
+            font-size: 0;
+            line-height: 0;
+            text-align: center;
+        }
+        .gallery-cell {
+            display: inline-block;
+            width: 330px;
+            height: 400px;
+            overflow: hidden;
+            vertical-align: top;
+            background: #0F172A;
+        }
+        .gallery-cell-full {
+            display: block;
+            width: 660px;
+            height: 400px;
+            overflow: hidden;
+            background: #0F172A;
+        }
+        .gallery-cell-tall {
+            display: block;
+            width: 660px;
+            height: 800px;
+            overflow: hidden;
+            background: #0F172A;
+        }
+        .gallery-cell img,
+        .gallery-cell-full img,
+        .gallery-cell-tall img {
+            object-fit: cover;
+            object-position: center;
+            display: block;
+        }
+        .gallery-cell img { width: 330px; height: 400px; }
+        .gallery-cell-full img { width: 660px; height: 400px; }
+        .gallery-cell-tall img { width: 660px; height: 800px; }
+
         /* ===== O'NG TOMON: PASPORT ===== */
         .passport-header {
             padding: 16px 20px 14px;
@@ -280,17 +352,40 @@
 <body>
     <div class="passport-wrapper">
 
-        {% if image %}
-        <!-- CHAP TOMON: BITTA RASM -->
+        {% if images %}
+        <!-- CHAP TOMON: RASMLAR (1-4 ta) -->
         <div class="passport-left">
-            <div class="gallery-single">
-                <img src="{{ image }}" alt="Markaz rasmi">
-            </div>
+            {% if images|length == 1 %}
+                <div class="gallery-cell-tall">
+                    <img src="{{ images.0 }}" alt="Markaz rasmi">
+                </div>
+            {% elif images|length == 2 %}
+                <div class="gallery-multi">
+                    <div class="gallery-cell-full"><img src="{{ images.0 }}" alt="Markaz rasmi 1"></div>
+                    <div class="gallery-cell-full"><img src="{{ images.1 }}" alt="Markaz rasmi 2"></div>
+                </div>
+            {% elif images|length == 3 %}
+                <div class="gallery-multi">
+                    <div class="gallery-cell-full"><img src="{{ images.0 }}" alt="Markaz rasmi 1"></div>
+                    <div class="gallery-multi-row">
+                        <div class="gallery-cell"><img src="{{ images.1 }}" alt="Markaz rasmi 2"></div><div class="gallery-cell"><img src="{{ images.2 }}" alt="Markaz rasmi 3"></div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="gallery-multi">
+                    <div class="gallery-multi-row">
+                        <div class="gallery-cell"><img src="{{ images.0 }}" alt="Markaz rasmi 1"></div><div class="gallery-cell"><img src="{{ images.1 }}" alt="Markaz rasmi 2"></div>
+                    </div>
+                    <div class="gallery-multi-row">
+                        <div class="gallery-cell"><img src="{{ images.2 }}" alt="Markaz rasmi 3"></div><div class="gallery-cell"><img src="{{ images.3 }}" alt="Markaz rasmi 4"></div>
+                    </div>
+                </div>
+            {% endif %}
         </div>
         {% endif %}
 
         <!-- O'NG TOMON: PASPORT -->
-        <div class="{% if image %}passport-right{% else %}passport-right-full{% endif %}">
+        <div class="{% if images %}passport-right{% else %}passport-right-full{% endif %}">
             <!-- Header -->
             <div class="passport-header">
                 <div class="passport-header-row">

@@ -8,7 +8,6 @@ from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.contrib.admin.views.decorators import staff_member_required
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
-import weasyprint
 
 from .models import Region, District, Mahalla, CulturalCenter, Slide, GuestHouse, ExemplaryCenter
 from .serializers import (
@@ -323,15 +322,14 @@ def passport_pdf(request, pk):
     """PDF pasport generatsiyasi"""
     center = get_object_or_404(CulturalCenter.objects.select_related('district', 'district__region', 'mahalla'), pk=pk)
 
-    # 1. Rasmni tayyorlash — faqat bitta (birinchi) rasm
-    image = None
+    # 1. Rasmlarni tayyorlash — 4 tagacha rasm (2x2 grid)
+    images = []
     if center.has_own_building is not False:
-        first_img = center.images.all().order_by('order').first()
-        if first_img:
+        for img in center.images.all().order_by('order')[:4]:
             try:
-                image = 'file://' + first_img.image.path
+                images.append('file://' + img.image.path)
             except Exception:
-                image = None
+                pass
                 
     # Kategoriya dizayni
     categories_info = {
@@ -353,7 +351,7 @@ def passport_pdf(request, pk):
 
     context = {
         'c': center,
-        'image': image,
+        'images': images,
         'category_label': cat_info['label'],
         'category_color': cat_info['color'],
         'condition_label': cond_info['label'],
@@ -364,6 +362,7 @@ def passport_pdf(request, pk):
     html_string = render_to_string('centers/passport_pdf.html', context, request=request)
     
     # WeasyPrint PDF qaytarish
+    import weasyprint
     html = weasyprint.HTML(string=html_string, base_url=request.build_absolute_uri('/'))
     pdf = html.write_pdf()
 
